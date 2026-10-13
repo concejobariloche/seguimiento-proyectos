@@ -795,7 +795,8 @@
         return;
       }
 
-      let comisionActual = "";
+      // Si el proyecto está en tratamiento, toma la comisión actual. De lo contrario, asigna null para Supabase.
+      let comisionActual = null;
       if (estado === 'En tratamiento') {
         comisionActual = document.getElementById('comisionActualSelect').value || DICTAMINADO_OPTION;
       }
@@ -808,8 +809,8 @@
         ruta: [...selectedRutaOrder],
         estado,
         comision_actual: comisionActual,
-        acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? acta : "",
-        nota
+        acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? acta : null,
+        nota: nota || null
       };
 
       saveProjectToSupabase(projectData, editId);

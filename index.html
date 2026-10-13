@@ -197,11 +197,11 @@
                   <i id="sortIcon" class="fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform"></i>
                 </div>
               </th>
-              <th scope="col" class="py-3.5 px-4 min-w-[280px]">Descripción Sintética</th>
+              <th scope="col" class="py-3.5 px-4 min-w-[300px]">Descripción Sintética</th>
               <th scope="col" class="py-3.5 px-4 w-40">Autores</th>
-              <th scope="col" class="py-3.5 px-4 w-72">Ruta Legislativa</th>
+              <th scope="col" class="py-3.5 px-4 w-96 min-w-[320px]">Ruta Legislativa</th>
               <th scope="col" class="py-3.5 px-4 w-44">Estado / Ubicación</th>
-              <th scope="col" class="py-3.5 px-4 w-16 whitespace-nowrap text-center">N° Acta</th>
+              <th scope="col" class="py-3.5 px-4 w-24 whitespace-nowrap text-center">N° Acta</th>
               <th scope="col" class="py-3.5 px-4 min-w-[150px]">Observaciones</th>
               <th scope="col" class="py-3.5 px-4 w-20 text-center">Acciones</th>
             </tr>
@@ -1005,7 +1005,7 @@
         return `
           <tr class="hover:bg-slate-50 transition-colors">
             <td class="py-3 px-4 font-mono font-bold text-indigo-700 align-top whitespace-nowrap">${escapeHtml(p.numero)}</td>
-            <td class="py-3 px-4 align-top"><p class="font-medium text-slate-800 leading-snug line-clamp-3">${escapeHtml(p.descripcion)}</p></td>
+            <td class="py-3 px-4 align-top"><p class="font-medium text-slate-800 leading-snug whitespace-normal break-words">${escapeHtml(p.descripcion)}</p></td>
             <td class="py-3 px-4 align-top">${autoresHtml}</td>
             <td class="py-3 px-4 align-top">${rutaHtml || '<span class="text-xs text-slate-400 italic">N/A</span>'}</td>
             <td class="py-3 px-4 align-top space-y-1">

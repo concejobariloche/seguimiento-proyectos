@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimiento de Proyectos - Concejo Municipal de San Carlos de Bariloche</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS Client UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div class="bg-white p-1 rounded-xl shadow-md flex items-center justify-center shrink-0 w-11 h-11 overflow-hidden">
+          <img src="logo.png" alt="Escudo Bariloche" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'black\'><rect width=\'100\' height=\'25\' rx=\'3\' fill=\'%231e293b\'/><text x=\'50\' y=\'17\' font-size=\'10\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\'>BARILOCHE</text><path d=\'M20,30 L80,30 L75,85 L50,95 L25,85 Z\' fill=\'none\' stroke=\'%231e293b\' stroke-width=\'3\'/><circle cx=\'65\' cy=\'40\' r=\'6\' fill=\'%231e293b\'/></svg>';">
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">Seguimiento de Proyectos</h1>
+          <p class="text-xs text-slate-400 font-medium">Concejo Municipal de San Carlos de Bariloche</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <div id="modeBadge" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-blue-900/80 text-blue-200 border border-blue-700/60 flex items-center gap-1.5">
+          <i class="fa-solid fa-eye text-blue-400"></i>
+          <span>Modo Visualizador</span>
+        </div>
+
+        <button id="authBtn" onclick="toggleAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all shadow flex items-center gap-2">
+          <i class="fa-solid fa-lock"></i>
+          <span id="authBtnText">Ingreso Admin</span>
+        </button>
+
+        <button id="changePassBtn" onclick="openChangePasswordModal()" class="hidden px-3 py-1.5 text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-key"></i>
+          <span class="hidden sm:inline">Cambiar Clave</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ESTADÍSTICAS EN TIEMPO REAL -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statTotal" class="text-2xl font-black text-slate-900">0</span>
+          <i class="fa-solid fa-folder text-slate-400 text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">En Tratamiento</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statTratamiento" class="text-2xl font-black text-amber-600">0</span>
+          <i class="fa-solid fa-hourglass-half text-amber-500 text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Dictaminados</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statDictaminados" class="text-2xl font-black text-purple-600">0</span>
+          <i class="fa-solid fa-gavel text-purple-500 text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Aprobados</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statAprobados" class="text-2xl font-black text-emerald-600">0</span>
+          <i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Rechazados</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statRechazados" class="text-2xl font-black text-rose-600">0</span>
+          <i class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Retirados</span>
+        <div class="flex items-baseline justify-between mt-2">
+          <span id="statRetirados" class="text-2xl font-black text-slate-600">0</span>
+          <i class="fa-solid fa-box-archive text-slate-500 text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="relative flex-grow">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <input type="text" id="searchInput" oninput="renderProjects()" placeholder="Buscar por N° proyecto, descripción, autores, ruta, acta u observaciones..." 
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+        </div>
+        <div id="adminControls" class="hidden">
+          <button onclick="openProjectModal()" class="w-full md:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Cargar Proyecto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Filtrar por Estado:</label>
+          <select id="filterEstado" onchange="onEstadoFilterChange()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODOS">Todos los estados</option>
+            <option value="Sin ruta">Sin ruta</option>
+            <option value="En tratamiento">En tratamiento</option>
+            <option value="Aprobado en sesión">Aprobado en sesión</option>
+            <option value="Rechazado en sesión">Rechazado en sesión</option>
+            <option value="Retirado en sesión">Retirado en sesión</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Tipo de Proyecto:</label>
+          <select id="filterTipo" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODOS">Todos los tipos</option>
+            <option value="Ordenanza">Ordenanza</option>
+            <option value="Declaración">Declaración</option>
+            <option value="Comunicación">Comunicación</option>
+            <option value="Resolución">Resolución</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Comisión en Ruta:</label>
+          <select id="filterComisionRuta" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODAS">Cualquier comisión</option>
+            <option value="Asesoría Letrada">Asesoría Letrada</option>
+            <option value="Comisión de Turismo">Comisión de Turismo</option>
+            <option value="Comisión de Economía">Comisión de Economía</option>
+            <option value="Comisión de Servicios">Comisión de Servicios</option>
+            <option value="Comisión de Gobierno y Legales">Comisión de Gobierno y Legales</option>
+            <option value="Comisión de Obras">Comisión de Obras</option>
+            <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
+            <option value="Sobre Tablas">Sobre Tablas</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Ubicación Actual:</label>
+          <select id="filterComisionActual" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODAS">Todas las ubicaciones</option>
+            <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
+            <option value="Asesoría Letrada">Asesoría Letrada</option>
+            <option value="Comisión de Turismo">Comisión de Turismo</option>
+            <option value="Comisión de Economía">Comisión de Economía</option>
+            <option value="Comisión de Servicios">Comisión de Servicios</option>
+            <option value="Comisión de Gobierno y Legales">Comisión de Gobierno y Legales</option>
+            <option value="Comisión de Obras">Comisión de Obras</option>
+            <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
+            <option value="Sobre Tablas">Sobre Tablas</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Filtrar por Autor:</label>
+          <select id="filterAutor" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODOS">Todos los autores</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Partido / Bloque:</label>
+          <select id="filterPartido" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="TODOS">Todos los partidos</option>
+            <option value="Ejecutivo">Ejecutivo</option>
+            <option value="Tribunal de Contralor">Tribunal de Contralor</option>
+            <option value="PUL">PUL</option>
+            <option value="JSRN">JSRN</option>
+            <option value="Incluyendo">Incluyendo</option>
+            <option value="Nos Une">Nos Une</option>
+            <option value="JxC">JxC</option>
+            <option value="Bariloche Suma +">Bariloche Suma +</option>
+            <option value="Primero Río Negro">Primero Río Negro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900 text-slate-200 font-semibold uppercase text-xs tracking-wider">
+            <tr>
+              <th scope="col" onclick="toggleSortOrder()" class="py-3.5 px-4 w-28 whitespace-nowrap cursor-pointer hover:bg-slate-800 transition-colors select-none group" title="Haz clic para cambiar el orden numérico">
+                <div class="flex items-center gap-1.5">
+                  <span>N° Proyecto</span>
+                  <i id="sortIcon" class="fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                </div>
+              </th>
+              <th scope="col" class="py-3.5 px-4 min-w-[280px]">Descripción Sintética</th>
+              <th scope="col" class="py-3.5 px-4 w-40">Autores</th>
+              <th scope="col" class="py-3.5 px-4 w-72">Ruta Legislativa</th>
+              <th scope="col" class="py-3.5 px-4 w-44">Estado / Ubicación</th>
+              <th scope="col" class="py-3.5 px-4 w-16 whitespace-nowrap text-center">N° Acta</th>
+              <th scope="col" class="py-3.5 px-4 min-w-[150px]">Observaciones</th>
+              <th scope="col" class="py-3.5 px-4 w-20 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="projectsTableBody" class="divide-y divide-slate-200 text-slate-700">
+            <!-- Dinámico -->
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="hidden text-center py-12 px-4">
+        <i class="fa-solid fa-folder-open text-slate-300 text-5xl mb-3"></i>
+        <h3 class="text-base font-semibold text-slate-700">No se encontraron proyectos legislativos</h3>
+        <p class="text-slate-500 text-xs mt-1">Prueba cambiando los términos de búsqueda o los filtros aplicados.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: CREAR / EDITAR PROYECTO -->
+  <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 overflow-hidden transform transition-all">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 id="modalTitle" class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-file-circle-plus text-indigo-400"></i>
+          <span>Nuevo Proyecto</span>
+        </h3>
+        <button onclick="closeProjectModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-4">
+        <input type="hidden" id="editId" value="">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">N° Proyecto *</label>
+            <input type="text" id="numProyecto" required placeholder="Ej: 1-26"
+              class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <span class="text-[10px] text-slate-500">Formato: número-año (ej: 12-26)</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tipo de Proyecto *</label>
+            <select id="tipoProyectoSelect" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+              <option value="Ordenanza">Ordenanza</option>
+              <option value="Declaración">Declaración</option>
+              <option value="Comunicación">Comunicación</option>
+              <option value="Resolución">Resolución</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estado del Proyecto *</label>
+            <select id="estadoSelect" onchange="handleEstadoFormChange()" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="Sin ruta">Sin ruta</option>
+              <option value="En tratamiento">En tratamiento</option>
+              <option value="Aprobado en sesión">Aprobado en sesión</option>
+              <option value="Rechazado en sesión">Rechazado en sesión</option>
+              <option value="Retirado en sesión">Retirado en sesión</option>
+            </select>
+          </div>
+        </div>
+        <div id="comisionActualContainer" class="hidden bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+          <label class="block text-xs font-bold text-amber-900 uppercase mb-1">Ubicación / Comisión Actual *</label>
+          <select id="comisionActualSelect" class="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none font-medium"></select>
+          <p class="text-[11px] text-amber-700 mt-1">Si finalizó la ruta en comisiones, selecciona <strong>Dictaminado para sesión</strong>.</p>
+        </div>
+        <div id="numActaContainer" class="hidden bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Número de Acta de Sesión *</label>
+          <input type="text" id="numActa" placeholder="Ej: Acta N° 1042/26"
+            class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción Sintética *</label>
+          <textarea id="descripcion" rows="3" required placeholder="Ingrese la descripción sintética completa del proyecto..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Autores (Seleccionar uno o más) *</label>
+          <div id="autoresCheckboxList" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-36 overflow-y-auto text-xs"></div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase">Ruta Legislativa (Comisiones) *</label>
+            <span class="text-[11px] text-indigo-600 font-semibold">Se ordena según el orden de selección</span>
+          </div>
+          <div id="rutaCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-36 overflow-y-auto text-xs"></div>
+          <div id="rutaOrdenPreview" class="mt-2 text-xs bg-indigo-50/70 border border-indigo-200/60 p-2.5 rounded-lg flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-500 font-semibold text-[11px]">Orden actual:</span>
+            <span class="text-slate-400 italic text-[11px]">Ninguna comisión seleccionada</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Notas / Observaciones</label>
+          <textarea id="nota" rows="2" placeholder="Observaciones adicionales..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-lg transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow">Guardar Proyecto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLES -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-indigo-400"></i>
+          <span>Detalle de Proyecto</span>
+        </h3>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div id="detailContent" class="p-6 space-y-4 text-sm max-h-[80vh] overflow-y-auto"></div>
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
+        <button onclick="closeDetailModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-700">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN ADMIN -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-user-shield text-indigo-400"></i>
+          <span>Acceso Administrador</span>
+        </h3>
+        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Contraseña Administrador</label>
+          <input type="password" id="adminPasswordInput" required placeholder="Ingrese la clave..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          <p class="text-[11px] text-slate-500 mt-1.5">Contraseña por defecto: <code class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 font-mono text-indigo-700">admin123</code></p>
+        </div>
+        <div id="loginError" class="hidden text-xs text-rose-600 font-bold">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Contraseña incorrecta.
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="toggleAuthModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow">Ingresar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CAMBIAR CONTRASEÑA -->
+  <div id="changePassModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-key text-indigo-400"></i>
+          <span>Cambiar Contraseña Admin</span>
+        </h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <form onsubmit="handleChangePassword(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Contraseña Actual</label>
+          <input type="password" id="currPassInput" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nueva Contraseña</label>
+          <input type="password" id="newPassInput" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div id="passError" class="hidden text-xs text-rose-600 font-bold"></div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN DE SUPABASE (Reemplazar con tus credenciales)
+    // ==========================================
+    const SUPABASE_URL = 'https://ttzcoyjltafpytwkqoed.supabase.co'; // Ejemplo: 'https://xxxxxx.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0emNveWpsdGFmcHl0d2txb2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDI0NjksImV4cCI6MjEwNzQ3ODQ2OX0.p0uJ4VjaVYyHRXTENKmvyNXRqxE5AhUQYKIEihC1H4Y'; // Tu clave anónima pública
+    
+    let supabaseClient = null;
+    if (SUPABASE_URL !== 'TU_SUPABASE_URL_AQUÍ' && SUPABASE_ANON_KEY !== 'TU_SUPABASE_ANON_KEY_AQUÍ') {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    const AUTORES_DISPONIBLES = [
+      "Ejecutivo", "Tribunal de Contralor", "Gerardo Del Río (PUL)", "Tomás Hercigonja (PUL)", 
+      "María Coronado (PUL)", "Natalia Almonacid (JSRN)", "Silvio Barriga (JSRN)", "Juan Pablo Ferrari (JSRN)", 
+      "Laura Totonelli (JSRN)", "Lucas Pérez (Bariloche Suma +)", "Julieta Wallace (Incluyendo)", 
+      "Leandro Costa Brutten (Incluyendo)", "Norma Aguirre (Incluyendo)", "Roxana Ferreyra (Nos Une)", 
+      "Facundo Villalba (Primero Río Negro)", "Samanta Echenique (JxC)"
+    ];
+
+    const RUTA_OPCIONES = [
+      "Asesoría Letrada", "Comisión de Turismo", "Comisión de Economía", 
+      "Comisión de Servicios", "Comisión de Gobierno y Legales", "Comisión de Obras", 
+      "Comisión de Desarrollo Humano", "Sobre Tablas"
+    ];
+
+    const DICTAMINADO_OPTION = "Dictaminado para sesión";
+
+    let isAdmin = false;
+    let projects = [];
+    let sortAscending = true;
+    let selectedRutaOrder = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPassword();
+      renderAutoresCheckboxes();
+      renderRutaCheckboxes();
+      populateAutorFilter();
+      fetchProjectsFromSupabase();
+    });
+
+    function getStoredPassword() {
+      return localStorage.getItem('bariloche_admin_pass') || 'admin123';
+    }
+
+    function loadPassword() {
+      if (!localStorage.getItem('bariloche_admin_pass')) {
+        localStorage.setItem('bariloche_admin_pass', 'admin123');
+      }
+    }
+
+    function toggleAuthModal() {
+      if (isAdmin) {
+        isAdmin = false;
+        updateUIAuth();
+      } else {
+        document.getElementById('adminPasswordInput').value = '';
+        document.getElementById('loginError').classList.add('hidden');
+        document.getElementById('authModal').classList.remove('hidden');
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const input = document.getElementById('adminPasswordInput').value;
+      if (input === getStoredPassword()) {
+        isAdmin = true;
+        document.getElementById('authModal').classList.add('hidden');
+        updateUIAuth();
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    }
+
+    function updateUIAuth() {
+      const badge = document.getElementById('modeBadge');
+      const authBtnText = document.getElementById('authBtnText');
+      const authBtn = document.getElementById('authBtn');
+      const changeBtn = document.getElementById('changePassBtn');
+      const adminControls = document.getElementById('adminControls');
+
+      if (isAdmin) {
+        badge.className = "px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-900/80 text-emerald-200 border border-emerald-700/60 flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-user-gear text-emerald-400"></i><span>Modo Administrador</span>`;
+        authBtnText.textContent = "Salir Admin";
+        authBtn.className = "px-3.5 py-1.5 text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-all border border-slate-700 flex items-center gap-2";
+        changeBtn.classList.remove('hidden');
+        adminControls.classList.remove('hidden');
+      } else {
+        badge.className = "px-3 py-1.5 text-xs font-semibold rounded-full bg-blue-900/80 text-blue-200 border border-blue-700/60 flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-eye text-blue-400"></i><span>Modo Visualizador</span>`;
+        authBtnText.textContent = "Ingreso Admin";
+        authBtn.className = "px-3.5 py-1.5 text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all shadow flex items-center gap-2";
+        changeBtn.classList.add('hidden');
+        adminControls.classList.add('hidden');
+      }
+      renderProjects();
+    }
+
+    function openChangePasswordModal() {
+      document.getElementById('currPassInput').value = '';
+      document.getElementById('newPassInput').value = '';
+      document.getElementById('passError').classList.add('hidden');
+      document.getElementById('changePassModal').classList.remove('hidden');
+    }
+
+    function closeChangePasswordModal() {
+      document.getElementById('changePassModal').classList.add('hidden');
+    }
+
+    function handleChangePassword(e) {
+      e.preventDefault();
+      const curr = document.getElementById('currPassInput').value;
+      const newP = document.getElementById('newPassInput').value;
+      const err = document.getElementById('passError');
+
+      if (curr !== getStoredPassword()) {
+        err.textContent = "La contraseña actual es incorrecta.";
+        err.classList.remove('hidden');
+        return;
+      }
+      if (newP.trim().length < 4) {
+        err.textContent = "La nueva contraseña debe tener al menos 4 caracteres.";
+        err.classList.remove('hidden');
+        return;
+      }
+
+      localStorage.setItem('bariloche_admin_pass', newP.trim());
+      alert("Contraseña actualizada con éxito.");
+      closeChangePasswordModal();
+    }
+
+    async function fetchProjectsFromSupabase() {
+      if (!supabaseClient) {
+        // Fallback a localStorage o datos mock si no configuró Supabase aún
+        const stored = localStorage.getItem('bariloche_proyectos_v3');
+        projects = stored ? JSON.parse(stored) : [];
+        renderProjects();
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.from('proyectos').select('*');
+        if (error) throw error;
+        projects = data || [];
+        renderProjects();
+      } catch (err) {
+        console.error("Error al conectar con Supabase:", err);
+        // Si hay error en la tabla, intentar fallback local
+        const stored = localStorage.getItem('bariloche_proyectos_v3');
+        projects = stored ? JSON.parse(stored) : [];
+        renderProjects();
+      }
+    }
+
+    async function saveProjectToSupabase(projectData, editId = null) {
+      if (!supabaseClient) {
+        // Guardado local de contingencia
+        if (editId) {
+          const idx = projects.findIndex(p => p.id === editId || p.numero === editId);
+          if (idx >= 0) projects[idx] = { ...projectData, id: editId };
+        } else {
+          projects.unshift({ ...projectData, id: Date.now().toString() });
+        }
+        localStorage.setItem('bariloche_proyectos_v3', JSON.stringify(projects));
+        renderProjects();
+        closeProjectModal();
+        return;
+      }
+
+      try {
+        if (editId) {
+          const { error } = await supabaseClient
+            .from('proyectos')
+            .update(projectData)
+            .eq('id', editId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabaseClient
+            .from('proyectos')
+            .insert([projectData]);
+          if (error) throw error;
+        }
+        await fetchProjectsFromSupabase();
+        closeProjectModal();
+      } catch (err) {
+        alert("Error al guardar en Supabase: " + err.message);
+      }
+    }
+
+    async function deleteProjectFromSupabase(id, numero) {
+      if (!confirm(`¿Estás seguro de que deseas eliminar el proyecto ${numero}?`)) return;
+
+      if (!supabaseClient) {
+        projects = projects.filter(p => p.id !== id && p.numero !== id);
+        localStorage.setItem('bariloche_proyectos_v3', JSON.stringify(projects));
+        renderProjects();
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('proyectos')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        await fetchProjectsFromSupabase();
+      } catch (err) {
+        alert("Error al eliminar: " + err.message);
+      }
+    }
+
+    function normalizeText(text) {
+      if (!text) return "";
+      return text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function renderAutoresCheckboxes() {
+      const container = document.getElementById('autoresCheckboxList');
+      container.innerHTML = AUTORES_DISPONIBLES.map((autor) => `
+        <label class="flex items-center gap-2 p-1 rounded hover:bg-slate-100 cursor-pointer select-none">
+          <input type="checkbox" name="autoresSelected" value="${escapeHtml(autor)}" class="rounded text-indigo-600 focus:ring-indigo-500">
+          <span class="text-slate-700">${escapeHtml(autor)}</span>
+        </label>
+      `).join('');
+    }
+
+    function renderRutaCheckboxes() {
+      const container = document.getElementById('rutaCheckboxList');
+      container.innerHTML = RUTA_OPCIONES.map((comision) => `
+        <label class="flex items-center justify-between p-1 rounded hover:bg-slate-100 cursor-pointer select-none">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" name="rutaSelected" value="${escapeHtml(comision)}" onchange="toggleRutaComision('${escapeHtml(comision)}', this.checked)" class="rounded text-indigo-600 focus:ring-indigo-500">
+            <span class="text-slate-700">${escapeHtml(comision)}</span>
+          </div>
+          <span id="badge-ruta-${escapeHtml(comision).replace(/\s+/g, '-')}" class="hidden bg-indigo-600 text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center"></span>
+        </label>
+      `).join('');
+    }
+
+    function toggleRutaComision(comision, isChecked) {
+      if (isChecked) {
+        if (!selectedRutaOrder.includes(comision)) selectedRutaOrder.push(comision);
+      } else {
+        selectedRutaOrder = selectedRutaOrder.filter(item => item !== comision);
+      }
+      updateRutaVisualBadges();
+      updateComisionActualOptions();
+    }
+
+    function updateRutaVisualBadges() {
+      RUTA_OPCIONES.forEach(com => {
+        const badgeEl = document.getElementById(`badge-ruta-${com.replace(/\s+/g, '-')}`);
+        if (badgeEl) { badgeEl.classList.add('hidden'); badgeEl.textContent = ''; }
+      });
+      selectedRutaOrder.forEach((com, idx) => {
+        const badgeEl = document.getElementById(`badge-ruta-${com.replace(/\s+/g, '-')}`);
+        if (badgeEl) { badgeEl.classList.remove('hidden'); badgeEl.textContent = idx + 1; }
+      });
+
+      const previewEl = document.getElementById('rutaOrdenPreview');
+      if (selectedRutaOrder.length === 0) {
+        previewEl.innerHTML = `<span class="text-slate-500 font-semibold text-[11px]">Orden actual:</span> <span class="text-slate-400 italic text-[11px]">Ninguna comisión seleccionada</span>`;
+      } else {
+        const pills = selectedRutaOrder.map((com, idx) => `
+          <span class="inline-flex items-center bg-indigo-600 text-white font-semibold text-[11px] px-2 py-0.5 rounded-md gap-1">
+            <span class="bg-indigo-800 text-indigo-100 text-[9px] px-1 rounded font-bold">${idx + 1}</span>
+            <span>${escapeHtml(com)}</span>
+          </span>
+        `).join('<i class="fa-solid fa-arrow-right text-[10px] text-indigo-300"></i>');
+        previewEl.innerHTML = `<span class="text-slate-500 font-semibold text-[11px] mr-1">Orden actual:</span> ${pills}`;
+      }
+    }
+
+    function populateAutorFilter() {
+      const select = document.getElementById('filterAutor');
+      select.innerHTML = `<option value="TODOS">Todos los autores</option>` + 
+        AUTORES_DISPONIBLES.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+    }
+
+    function handleEstadoFormChange() {
+      const estado = document.getElementById('estadoSelect').value;
+      const comisionContainer = document.getElementById('comisionActualContainer');
+      const actaContainer = document.getElementById('numActaContainer');
+
+      if (estado === 'En tratamiento') {
+        comisionContainer.classList.remove('hidden');
+        actaContainer.classList.add('hidden');
+        updateComisionActualOptions();
+      } else if (['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado)) {
+        comisionContainer.classList.add('hidden');
+        actaContainer.classList.remove('hidden');
+      } else {
+        comisionContainer.classList.add('hidden');
+        actaContainer.classList.add('hidden');
+      }
+    }
+
+    function updateComisionActualOptions() {
+      const select = document.getElementById('comisionActualSelect');
+      const currentValue = select.value;
+      select.innerHTML = '';
+
+      const optDictaminado = document.createElement('option');
+      optDictaminado.value = DICTAMINADO_OPTION;
+      optDictaminado.textContent = `⭐ ${DICTAMINADO_OPTION}`;
+      optDictaminado.className = "font-bold text-purple-800 bg-purple-50";
+      select.appendChild(optDictaminado);
+
+      const targetList = selectedRutaOrder.length === 0 ? RUTA_OPCIONES : selectedRutaOrder;
+      targetList.forEach(com => {
+        const opt = document.createElement('option');
+        opt.value = com;
+        opt.textContent = com;
+        select.appendChild(opt);
+      });
+
+      if (currentValue && Array.from(select.options).some(o => o.value === currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
+    function onEstadoFilterChange() {
+      const estado = document.getElementById('filterEstado').value;
+      if (estado !== 'En tratamiento' && estado !== 'TODOS') {
+        document.getElementById('filterComisionActual').value = 'TODAS';
+      }
+      renderProjects();
+    }
+
+    function openProjectModal(editId = null) {
+      document.getElementById('editId').value = editId || '';
+      const form = document.getElementById('projectForm');
+      form.reset();
+
+      selectedRutaOrder = [];
+      document.querySelectorAll('input[name="autoresSelected"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('input[name="rutaSelected"]').forEach(cb => cb.checked = false);
+
+      if (editId !== null) {
+        const p = projects.find(item => item.id === editId || item.numero === editId);
+        if (p) {
+          document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-400"></i><span>Editar Proyecto ${escapeHtml(p.numero)}</span>`;
+          document.getElementById('numProyecto').value = p.numero;
+          document.getElementById('tipoProyectoSelect').value = p.tipo || 'Ordenanza';
+          document.getElementById('estadoSelect').value = p.estado;
+          document.getElementById('descripcion').value = p.descripcion;
+          document.getElementById('numActa').value = p.acta || '';
+          document.getElementById('nota').value = p.nota || '';
+
+          (p.autores || []).forEach(a => {
+            const cb = document.querySelector(`input[name="autoresSelected"][value="${CSS.escape(a)}"]`);
+            if (cb) cb.checked = true;
+          });
+
+          if (p.ruta && Array.isArray(p.ruta)) {
+            selectedRutaOrder = [...p.ruta];
+            selectedRutaOrder.forEach(r => {
+              const cb = document.querySelector(`input[name="rutaSelected"][value="${CSS.escape(r)}"]`);
+              if (cb) cb.checked = true;
+            });
+          }
+
+          handleEstadoFormChange();
+          if (p.estado === 'En tratamiento') {
+            document.getElementById('comisionActualSelect').value = p.comisionActual || DICTAMINADO_OPTION;
+          }
+        }
+      } else {
+        document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo Proyecto</span>`;
+        document.getElementById('tipoProyectoSelect').value = 'Ordenanza';
+        document.getElementById('estadoSelect').value = 'Sin ruta';
+        handleEstadoFormChange();
+      }
+
+      updateRutaVisualBadges();
+      document.getElementById('projectModal').classList.remove('hidden');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').classList.add('hidden');
+    }
+
+    function saveProject(e) {
+      e.preventDefault();
+
+      const editId = document.getElementById('editId').value || null;
+      const numero = document.getElementById('numProyecto').value.trim();
+      const tipo = document.getElementById('tipoProyectoSelect').value;
+      const estado = document.getElementById('estadoSelect').value;
+      const descripcion = document.getElementById('descripcion').value.trim();
+      const acta = document.getElementById('numActa').value.trim();
+      const nota = document.getElementById('nota').value.trim();
+
+      const autoresSelected = Array.from(document.querySelectorAll('input[name="autoresSelected"]:checked')).map(cb => cb.value);
+
+      if (autoresSelected.length === 0) {
+        alert("Debes seleccionar al menos un autor.");
+        return;
+      }
+      if (estado !== 'Sin ruta' && selectedRutaOrder.length === 0) {
+        alert("Debes seleccionar al menos una comisión en la Ruta Legislativa.");
+        return;
+      }
+
+      let comisionActual = "";
+      if (estado === 'En tratamiento') {
+        comisionActual = document.getElementById('comisionActualSelect').value || DICTAMINADO_OPTION;
+      }
+
+      const projectData = {
+        numero,
+        tipo,
+        descripcion,
+        autores: autoresSelected,
+        ruta: [...selectedRutaOrder],
+        estado,
+        comisionActual,
+        acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? acta : "",
+        nota
+      };
+
+      saveProjectToSupabase(projectData, editId);
+    }
+
+    function openDetailModal(idOrNum) {
+      const p = projects.find(item => item.id === idOrNum || item.numero === idOrNum);
+      if (!p) return;
+
+      const content = document.getElementById('detailContent');
+      let estadoBadge = "";
+      if (p.estado === "En tratamiento") {
+        estadoBadge = p.comisionActual === DICTAMINADO_OPTION 
+          ? `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200">⭐ Dictaminado para sesión</span>`
+          : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-200">En tratamiento</span>`;
+      } else if (p.estado === "Aprobado en sesión") {
+        estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Aprobado en sesión</span>`;
+      } else if (p.estado === "Rechazado en sesión") {
+        estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-rose-100 text-rose-800 border border-rose-200">Rechazado en sesión</span>`;
+      } else if (p.estado === "Retirado en sesión") {
+        estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-800 border border-slate-300">Retirado en sesión</span>`;
+      } else {
+        estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Sin ruta</span>`;
+      }
+
+      content.innerHTML = `
+        <div class="flex justify-between items-start gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <span class="text-xs font-bold uppercase text-slate-400">N° Proyecto & Tipo</span>
+            <div class="flex items-baseline gap-2.5 mt-0.5">
+              <h2 class="text-xl font-black text-indigo-700">${escapeHtml(p.numero)}</h2>
+              <span class="text-xl font-black text-slate-800">•</span>
+              <span class="text-xl font-black text-slate-800">${escapeHtml(p.tipo || 'Ordenanza')}</span>
+            </div>
+          </div>
+          <div>${estadoBadge}</div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Descripción Sintética</h4>
+          <p class="text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium leading-relaxed">${escapeHtml(p.descripcion)}</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Autores</h4>
+            <div class="space-y-1">
+              ${(p.autores || []).map(a => `<span class="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded border border-slate-200 font-medium mr-1 mb-1">${escapeHtml(a)}</span>`).join('')}
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Comisión / Ubicación Actual</h4>
+            <p class="text-sm font-semibold text-slate-800">${escapeHtml(p.comisionActual || p.estado)}</p>
+            ${p.acta ? `<p class="text-xs text-indigo-600 font-bold mt-1"><i class="fa-solid fa-file-signature mr-1"></i>${escapeHtml(p.acta)}</p>` : ''}
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Ruta Legislativa</h4>
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${(p.ruta || []).map((r, i) => `
+              <span class="inline-flex items-center bg-indigo-50 text-indigo-800 text-xs px-2.5 py-1 rounded-lg border border-indigo-200 font-semibold">
+                <span class="bg-indigo-600 text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center mr-1.5">${i + 1}</span>
+                ${escapeHtml(r)}
+              </span>
+              ${i < (p.ruta.length - 1) ? '<i class="fa-solid fa-chevron-right text-indigo-300 text-xs"></i>' : ''}
+            `).join('')}
+          </div>
+        </div>
+        ${p.nota ? `
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Notas / Observaciones</h4>
+            <p class="text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs leading-relaxed italic">${escapeHtml(p.nota)}</p>
+          </div>
+        ` : ''}
+      `;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function getProjectBaseNumber(numStr) {
+      if (!numStr) return 0;
+      const parts = numStr.toString().trim().split('-');
+      const num = parseInt(parts[0], 10);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function toggleSortOrder() {
+      sortAscending = !sortAscending;
+      const sortIcon = document.getElementById('sortIcon');
+      if (sortIcon) {
+        sortIcon.className = sortAscending 
+          ? "fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform" 
+          : "fa-solid fa-arrow-down-9-1 text-indigo-400 group-hover:scale-110 transition-transform";
+      }
+      renderProjects();
+    }
+
+    function renderProjects() {
+      const tbody = document.getElementById('projectsTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const searchNorm = normalizeText(document.getElementById('searchInput').value);
+
+      const filterEstado = document.getElementById('filterEstado').value;
+      const filterTipo = document.getElementById('filterTipo').value;
+      const filterRuta = document.getElementById('filterComisionRuta').value;
+      const filterComision = document.getElementById('filterComisionActual').value;
+      const filterAutor = document.getElementById('filterAutor').value;
+      const filterPartido = document.getElementById('filterPartido').value;
+
+      let filtered = projects.filter(p => {
+        const matchNum = normalizeText(p.numero).includes(searchNorm);
+        const matchDesc = normalizeText(p.descripcion).includes(searchNorm);
+        const matchAutores = (p.autores || []).some(a => normalizeText(a).includes(searchNorm));
+        const matchRuta = (p.ruta || []).some(r => normalizeText(r).includes(searchNorm));
+        const matchActa = normalizeText(p.acta).includes(searchNorm);
+        const matchNota = normalizeText(p.nota).includes(searchNorm);
+        if (!(matchNum || matchDesc || matchAutores || matchRuta || matchActa || matchNota)) return false;
+
+        if (filterEstado !== 'TODOS' && p.estado !== filterEstado) return false;
+        if (filterTipo !== 'TODOS' && (p.tipo || 'Ordenanza') !== filterTipo) return false;
+        if (filterRuta !== 'TODAS' && !(p.ruta || []).includes(filterRuta)) return false;
+        if (filterComision !== 'TODAS') {
+          if (filterComision === DICTAMINADO_OPTION) {
+            if (p.comisionActual !== DICTAMINADO_OPTION) return false;
+          } else {
+            if (p.comisionActual !== filterComision) return false;
+          }
+        }
+        if (filterAutor !== 'TODOS' && !(p.autores || []).includes(filterAutor)) return false;
+        if (filterPartido !== 'TODOS') {
+          const tienePartido = (p.autores || []).some(autor => {
+            if (filterPartido === 'Ejecutivo') return autor === 'Ejecutivo';
+            if (filterPartido === 'Tribunal de Contralor') return autor === 'Tribunal de Contralor';
+            return autor.includes(`(${filterPartido})`);
+          });
+          if (!tienePartido) return false;
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        const numA = getProjectBaseNumber(a.numero);
+        const numB = getProjectBaseNumber(b.numero);
+        return sortAscending ? (numA - numB) : (numB - numA);
+      });
+
+      document.getElementById('statTotal').textContent = projects.length;
+      document.getElementById('statTratamiento').textContent = projects.filter(p => p.estado === 'En tratamiento' && p.comisionActual !== DICTAMINADO_OPTION).length;
+      document.getElementById('statDictaminados').textContent = projects.filter(p => p.estado === 'En tratamiento' && p.comisionActual === DICTAMINADO_OPTION).length;
+      document.getElementById('statAprobados').textContent = projects.filter(p => p.estado === 'Aprobado en sesión').length;
+      document.getElementById('statRechazados').textContent = projects.filter(p => p.estado === 'Rechazado en sesión').length;
+      document.getElementById('statRetirados').textContent = projects.filter(p => p.estado === 'Retirado en sesión' || p.estado === 'Sin ruta').length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map((p) => {
+        const recordId = p.id || p.numero;
+
+        let estadoBadge = "";
+        if (p.estado === "En tratamiento") {
+          estadoBadge = p.comisionActual === DICTAMINADO_OPTION 
+            ? `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200">⭐ Dictaminado</span>`
+            : `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-200">En tratamiento</span>`;
+        } else if (p.estado === "Aprobado en sesión") {
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Aprobado</span>`;
+        } else if (p.estado === "Rechazado en sesión") {
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-rose-100 text-rose-800 border border-rose-200">Rechazado</span>`;
+        } else if (p.estado === "Retirado en sesión") {
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-800 border border-slate-300">Retirado</span>`;
+        } else {
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Sin ruta</span>`;
+        }
+
+        const autoresHtml = (p.autores || []).map(a => `<span class="inline-block bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded border border-slate-200 font-medium mr-1 mb-1">${escapeHtml(a)}</span>`).join('');
+        const rutaHtml = (p.ruta || []).map((r, i) => `
+          <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-[11px] px-2 py-0.5 rounded border border-indigo-100 font-medium mr-1 mb-1">
+            <span class="text-[9px] bg-indigo-200 text-indigo-900 font-bold px-1 rounded mr-1">${i + 1}</span>
+            ${escapeHtml(r)}
+          </span>
+        `).join('');
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="py-3 px-4 font-mono font-bold text-indigo-700 align-top whitespace-nowrap">${escapeHtml(p.numero)}</td>
+            <td class="py-3 px-4 align-top"><p class="font-medium text-slate-800 leading-snug line-clamp-3">${escapeHtml(p.descripcion)}</p></td>
+            <td class="py-3 px-4 align-top">${autoresHtml}</td>
+            <td class="py-3 px-4 align-top">${rutaHtml || '<span class="text-xs text-slate-400 italic">N/A</span>'}</td>
+            <td class="py-3 px-4 align-top space-y-1">
+              <div>${estadoBadge}</div>
+              ${p.comisionActual && p.estado === 'En tratamiento' ? `<p class="text-xs font-semibold text-slate-600 mt-1"><i class="fa-solid fa-location-dot text-amber-500 mr-1"></i>${escapeHtml(p.comisionActual)}</p>` : ''}
+            </td>
+            <td class="py-3 px-4 align-top font-semibold text-xs text-slate-700 text-center whitespace-nowrap">${escapeHtml(p.acta || '-')}</td>
+            <td class="py-3 px-4 align-top text-xs text-slate-500 italic leading-relaxed">${escapeHtml(p.nota || '-')}</td>
+            <td class="py-3 px-4 align-top text-center whitespace-nowrap">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="openDetailModal('${recordId}')" title="Ver detalle" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                  <i class="fa-solid fa-eye text-base"></i>
+                </button>
+                ${isAdmin ? `
+                  <button onclick="openProjectModal('${recordId}')" title="Editar" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                    <i class="fa-solid fa-pen-to-square text-base"></i>
+                  </button>
+                  <button onclick="deleteProjectFromSupabase('${recordId}', '${escapeHtml(p.numero)}')" title="Eliminar" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                    <i class="fa-solid fa-trash-can text-base"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

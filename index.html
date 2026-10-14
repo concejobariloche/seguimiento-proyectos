@@ -221,12 +221,9 @@
   </main>
 
   <!-- MODAL: CREAR / EDITAR PROYECTO -->
- <!-- MODAL: CREAR / EDITAR PROYECTO -->
-  <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
-    <!-- Cambiamos overflow-hidden por flex flex-col y limitamos la altura máxima de la ventana -->
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-auto max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
-      <!-- Cabecera fija para que no se mueva -->
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shrink-0">
+  <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-auto max-h-[94vh] flex flex-col overflow-hidden transform transition-all">
+      <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
         <h3 id="modalTitle" class="text-lg font-bold flex items-center gap-2">
           <i class="fa-solid fa-file-circle-plus text-indigo-400"></i>
           <span>Nuevo Proyecto</span>
@@ -235,10 +232,9 @@
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
-      <!-- Hacemos que el formulario sea el que tenga el scroll interno -->
-      <form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-4 overflow-y-auto flex-grow">
+      <form id="projectForm" onsubmit="saveProject(event)" class="p-5 space-y-3 overflow-y-auto flex-grow text-sm">
         <input type="hidden" id="editId" value="">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">N° Proyecto *</label>
             <input type="text" id="numProyecto" required placeholder="Ej: 1-26"
@@ -255,7 +251,7 @@
             </select>
           </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estado del Proyecto *</label>
             <select id="estadoSelect" onchange="handleEstadoFormChange()" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -267,42 +263,44 @@
             </select>
           </div>
         </div>
-        <div id="comisionActualContainer" class="hidden bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+        <div id="comisionActualContainer" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200">
           <label class="block text-xs font-bold text-amber-900 uppercase mb-1">Ubicación / Comisión Actual *</label>
-          <select id="comisionActualSelect" class="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none font-medium"></select>
+          <select id="comisionActualSelect" class="w-full bg-white border border-amber-300 rounded-lg px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none font-medium"></select>
           <p class="text-[11px] text-amber-700 mt-1">Si finalizó la ruta en comisiones, selecciona <strong>Dictaminado para sesión</strong>.</p>
         </div>
-        <div id="numActaContainer" class="hidden bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <div id="numActaContainer" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200">
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Número de Acta de Sesión *</label>
           <input type="text" id="numActa" placeholder="Ej: Acta N° 1042/26"
             class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción Sintética *</label>
-          <textarea id="descripcion" rows="3" required placeholder="Ingrese la descripción sintética completa del proyecto..."
+          <textarea id="descripcion" rows="2" required placeholder="Ingrese la descripción sintética completa del proyecto..."
             class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Autores (Seleccionar uno o más) *</label>
-          <div id="autoresCheckboxList" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-36 overflow-y-auto text-xs"></div>
+          <!-- Limitamos la altura máxima a 28 (max-h-28) para que no sature la pantalla -->
+          <div id="autoresCheckboxList" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
         </div>
         <div>
           <div class="flex items-center justify-between mb-1">
             <label class="block text-xs font-bold text-slate-700 uppercase">Ruta Legislativa (Comisiones) *</label>
             <span class="text-[11px] text-indigo-600 font-semibold">Se ordena según el orden de selección</span>
           </div>
-          <div id="rutaCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-36 overflow-y-auto text-xs"></div>
-          <div id="rutaOrdenPreview" class="mt-2 text-xs bg-indigo-50/70 border border-indigo-200/60 p-2.5 rounded-lg flex flex-wrap items-center gap-1.5">
+          <!-- Limitamos la altura máxima a 28 (max-h-28) -->
+          <div id="rutaCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
+          <div id="rutaOrdenPreview" class="mt-2 text-xs bg-indigo-50/70 border border-indigo-200/60 p-2 rounded-lg flex flex-wrap items-center gap-1.5">
             <span class="text-slate-500 font-semibold text-[11px]">Orden actual:</span>
             <span class="text-slate-400 italic text-[11px]">Ninguna comisión seleccionada</span>
           </div>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Notas / Observaciones</label>
-          <textarea id="nota" rows="2" placeholder="Observaciones adicionales..."
+          <textarea id="nota" rows="1" placeholder="Observaciones adicionales..."
             class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
         </div>
-        <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 sticky bottom-0 bg-white py-2">
           <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-lg transition-colors">Cancelar</button>
           <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow">Guardar Proyecto</button>
         </div>

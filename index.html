@@ -418,21 +418,30 @@
     let sortAscending = true;
     let selectedRutaOrder = [];
 
+   // Variable global para almacenar la contraseña actual en memoria
+    let currentAdminPass = 'admin123';
+
     window.addEventListener('DOMContentLoaded', () => {
-      loadPassword();
+      loadPasswordFromSupabase();
       renderAutoresCheckboxes();
       renderRutaCheckboxes();
       populateAutorFilter();
       fetchProjectsFromSupabase();
     });
 
-    function getStoredPassword() {
-      return localStorage.getItem('bariloche_admin_pass') || 'admin123';
-    }
-
-    function loadPassword() {
-      if (!localStorage.getItem('bariloche_admin_pass')) {
-        localStorage.setItem('bariloche_admin_pass', 'admin123');
+    async function loadPasswordFromSupabase() {
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('configuracion')
+          .select('valor')
+          .eq('id', 'admin_password')
+          .single();
+        if (data && data.valor) {
+          currentAdminPass = data.valor;
+        }
+      } catch (err) {
+        console.error("No se pudo cargar la contraseña de Supabase, usando por defecto.", err);
       }
     }
 
@@ -447,10 +456,14 @@
       }
     }
 
-    function handleLogin(e) {
+ async function handleLogin(e) {
       e.preventDefault();
       const input = document.getElementById('adminPasswordInput').value;
-      if (input === getStoredPassword()) {
+      
+      // Intentamos refrescar la clave desde Supabase antes de validar por seguridad
+      await loadPasswordFromSupabase();
+
+      if (input === currentAdminPass) {
         isAdmin = true;
         document.getElementById('authModal').classList.add('hidden');
         updateUIAuth();
@@ -495,13 +508,15 @@
       document.getElementById('changePassModal').classList.add('hidden');
     }
 
-    function handleChangePassword(e) {
+    async function handleChangePassword(e) {
       e.preventDefault();
       const curr = document.getElementById('currPassInput').value;
       const newP = document.getElementById('newPassInput').value;
       const err = document.getElementById('passError');
 
-      if (curr !== getStoredPassword()) {
+      await loadPasswordFromSupabase();
+
+      if (curr !== currentAdminPass) {
         err.textContent = "La contraseña actual es incorrecta.";
         err.classList.remove('hidden');
         return;
@@ -512,9 +527,27 @@
         return;
       }
 
-      localStorage.setItem('bariloche_admin_pass', newP.trim());
-      alert("Contraseña actualizada con éxito.");
-      closeChangePasswordModal();
+      if (!supabaseClient) {
+        err.textContent = "No hay conexión con Supabase configurada.";
+        err.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('configuracion')
+          .update({ valor: newP.trim() })
+          .eq('id', 'admin_password');
+
+        if (error) throw error;
+
+        currentAdminPass = newP.trim();
+        alert("Contraseña actualizada con éxito en la base de datos.");
+        closeChangePasswordModal();
+      } catch (err) {
+        err.textContent = "Error al actualizar en Supabase: " + err.message;
+        err.classList.remove('hidden');
+      }
     }
 
     async function fetchProjectsFromSupabase() {

@@ -221,9 +221,12 @@
   </main>
 
   <!-- MODAL: CREAR / EDITAR PROYECTO -->
+ <!-- MODAL: CREAR / EDITAR PROYECTO -->
   <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 overflow-hidden transform transition-all">
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+    <!-- Cambiamos overflow-hidden por flex flex-col y limitamos la altura máxima de la ventana -->
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-auto max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
+      <!-- Cabecera fija para que no se mueva -->
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shrink-0">
         <h3 id="modalTitle" class="text-lg font-bold flex items-center gap-2">
           <i class="fa-solid fa-file-circle-plus text-indigo-400"></i>
           <span>Nuevo Proyecto</span>
@@ -232,7 +235,8 @@
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
-      <form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-4">
+      <!-- Hacemos que el formulario sea el que tenga el scroll interno -->
+      <form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-4 overflow-y-auto flex-grow">
         <input type="hidden" id="editId" value="">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>

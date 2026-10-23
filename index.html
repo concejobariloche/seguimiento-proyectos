@@ -300,6 +300,11 @@
           <textarea id="nota" rows="1" placeholder="Observaciones adicionales..."
             class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
         </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Link de Google Drive / Archivos</label>
+          <input type="url" id="proyectoLink" placeholder="https://drive.google.com/..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 sticky bottom-0 bg-white py-2">
           <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-lg transition-colors">Cancelar</button>
           <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow">Guardar Proyecto</button>
@@ -782,6 +787,7 @@
           document.getElementById('descripcion').value = p.descripcion;
           document.getElementById('numActa').value = p.acta || '';
           document.getElementById('nota').value = p.nota || '';
+          document.getElementById('proyectoLink').value = p.link || '';
 
           (p.autores || []).forEach(a => {
             const cb = document.querySelector(`input[name="autoresSelected"][value="${CSS.escape(a)}"]`);
@@ -806,6 +812,7 @@
         document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo Proyecto</span>`;
         document.getElementById('tipoProyectoSelect').value = 'Ordenanza';
         document.getElementById('estadoSelect').value = 'Sin ruta';
+        document.getElementById('proyectoLink').value = '';
         handleEstadoFormChange();
       }
 
@@ -850,6 +857,8 @@
         comisionActual = seleccionadas.join(', ');
       }
 
+      const link = document.getElementById('proyectoLink').value.trim();
+
       const projectData = {
         numero,
         tipo,
@@ -859,7 +868,8 @@
         estado,
         comision_actual: comisionActual,
         acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? acta : null,
-        nota: nota || null
+        nota: nota || null,
+        link: link || null
       };
 
       saveProjectToSupabase(projectData, editId);
@@ -931,6 +941,16 @@
           <div>
             <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Notas / Observaciones</h4>
             <p class="text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs leading-relaxed italic">${escapeHtml(p.nota)}</p>
+          </div>
+        ` : ''}
+        ${p.link ? `
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Archivos del Proyecto</h4>
+            <a href="${escapeHtml(p.link)}" target="_blank" class="inline-flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">
+              <i class="fa-brands fa-google-drive text-base text-indigo-600"></i>
+              <span>Abrir carpeta de Google Drive</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>
+            </a>
           </div>
         ` : ''}
       `;

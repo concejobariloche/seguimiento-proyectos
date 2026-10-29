@@ -116,7 +116,7 @@
           <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Filtrar por Estado:</label>
           <select id="filterEstado" onchange="onEstadoFilterChange()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
             <option value="TODOS">Todos los estados</option>
-            <option value="Sin ruta">Sin ruta</option>
+            <option value="No tomó estado parlamentario">No tomó estado parlamentario</option>
             <option value="En tratamiento">En tratamiento</option>
             <option value="Aprobado en sesión">Aprobado en sesión</option>
             <option value="Rechazado en sesión">Rechazado en sesión</option>
@@ -267,7 +267,7 @@
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estado del Proyecto *</label>
             <select id="estadoSelect" onchange="handleEstadoFormChange()" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="Sin ruta">Sin ruta</option>
+              <option value="No tomó estado parlamentario">No tomó estado parlamentario</option>
               <option value="En tratamiento">En tratamiento</option>
               <option value="Aprobado en sesión">Aprobado en sesión</option>
               <option value="Rechazado en sesión">Rechazado en sesión</option>
@@ -823,7 +823,7 @@
       } else {
         document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo Proyecto</span>`;
         document.getElementById('tipoProyectoSelect').value = 'Ordenanza';
-        document.getElementById('estadoSelect').value = 'Sin ruta';
+        document.getElementById('estadoSelect').value = 'No tomó estado parlamentario';
         document.getElementById('proyectoLink').value = '';
         handleEstadoFormChange();
       }
@@ -853,7 +853,7 @@
         alert("Debes seleccionar al menos un autor.");
         return;
       }
-      if (estado !== 'Sin ruta' && selectedRutaOrder.length === 0) {
+      if (estado !== 'No tomó estado parlamentario' && selectedRutaOrder.length === 0) {
         alert("Debes seleccionar al menos una comisión en la Ruta Legislativa.");
         return;
       }
@@ -905,8 +905,8 @@
       } else if (p.estado === "Retirado en sesión") {
         estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-800 border border-slate-300">Retirado en sesión</span>`;
       } else {
-        estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Sin ruta</span>`;
-      }
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">No tomó estado</span>`;
+        }
 
       content.innerHTML = `
         <div class="flex justify-between items-start gap-2 border-b border-slate-200 pb-3">
@@ -1046,7 +1046,7 @@
       document.getElementById('statDictaminados').textContent = projects.filter(p => p.estado === 'En tratamiento' && (p.comision_actual || p.comisionActual) === DICTAMINADO_OPTION).length;
       document.getElementById('statAprobados').textContent = projects.filter(p => p.estado === 'Aprobado en sesión').length;
       document.getElementById('statRechazados').textContent = projects.filter(p => p.estado === 'Rechazado en sesión').length;
-      document.getElementById('statRetirados').textContent = projects.filter(p => p.estado === 'Retirado en sesión' || p.estado === 'Sin ruta').length;
+      document.getElementById('statRetirados').textContent = projects.filter(p => p.estado === 'Retirado en sesión' || p.estado === 'No tomó estado parlamentario').length;
 
       // Actualizar la leyenda de resultados encontrados
       const resultsCountEl = document.getElementById('resultsCount');
@@ -1082,7 +1082,7 @@
         } else if (p.estado === "Retirado en sesión") {
           estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-800 border border-slate-300">Retirado</span>`;
         } else {
-          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Sin ruta</span>`;
+          estadoBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200">No tomó estado</span>`;
         }
 
         const autoresHtml = (p.autores || []).map(a => `<span class="inline-block bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded border border-slate-200 font-medium mr-1 mb-1">${escapeHtml(a)}</span>`).join('');

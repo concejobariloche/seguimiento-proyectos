@@ -246,6 +246,8 @@
       </div>
       <form id="projectForm" onsubmit="saveProject(event)" class="p-5 space-y-3 overflow-y-auto flex-grow text-sm">
         <input type="hidden" id="editId" value="">
+
+        <!-- 1. N° Proyecto y Tipo de Proyecto -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">N° Proyecto *</label>
@@ -263,6 +265,34 @@
             </select>
           </div>
         </div>
+
+        <!-- 2. Descripción Sintética -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción Sintética *</label>
+          <textarea id="descripcion" rows="2" required placeholder="Ingrese la descripción sintética completa del proyecto..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+        </div>
+
+        <!-- 3. Autores -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Autores (Seleccionar uno o más) *</label>
+          <div id="autoresCheckboxList" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
+        </div>
+
+        <!-- 4. Ruta Legislativa -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase">Ruta Legislativa (Comisiones) *</label>
+            <span class="text-[11px] text-indigo-600 font-semibold">Se ordena según el orden de selección</span>
+          </div>
+          <div id="rutaCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
+          <div id="rutaOrdenPreview" class="mt-2 text-xs bg-indigo-50/70 border border-indigo-200/60 p-2 rounded-lg flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-500 font-semibold text-[11px]">Orden actual:</span>
+            <span class="text-slate-400 italic text-[11px]">Ninguna comisión seleccionada</span>
+          </div>
+        </div>
+
+        <!-- 5. Estado del Proyecto (con sus contenedores condicionales) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estado del Proyecto *</label>
@@ -275,48 +305,34 @@
             </select>
           </div>
         </div>
+
         <div id="comisionActualContainer" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200">
           <label class="block text-xs font-bold text-amber-900 uppercase mb-1">Ubicación / Comisión Actual (Selecciona 1 o más) *</label>
           <div id="comisionActualCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-white border border-amber-300 rounded-lg p-2.5 max-h-32 overflow-y-auto text-xs"></div>
           <p class="text-[11px] text-amber-700 mt-1">Si finalizó la ruta en comisiones, marca únicamente <strong>⭐ Dictaminado para sesión</strong>.</p>
         </div>
+
         <div id="numActaContainer" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200">
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Número de Acta de Sesión *</label>
           <input type="text" id="numActa" placeholder="Ej: Acta N° 1042/26"
             class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción Sintética *</label>
-          <textarea id="descripcion" rows="2" required placeholder="Ingrese la descripción sintética completa del proyecto..."
-            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Autores (Seleccionar uno o más) *</label>
-          <!-- Limitamos la altura máxima a 28 (max-h-28) para que no sature la pantalla -->
-          <div id="autoresCheckboxList" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-bold text-slate-700 uppercase">Ruta Legislativa (Comisiones) *</label>
-            <span class="text-[11px] text-indigo-600 font-semibold">Se ordena según el orden de selección</span>
-          </div>
-          <!-- Limitamos la altura máxima a 28 (max-h-28) -->
-          <div id="rutaCheckboxList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-slate-50 border border-slate-300 rounded-lg p-2.5 max-h-28 overflow-y-auto text-xs"></div>
-          <div id="rutaOrdenPreview" class="mt-2 text-xs bg-indigo-50/70 border border-indigo-200/60 p-2 rounded-lg flex flex-wrap items-center gap-1.5">
-            <span class="text-slate-500 font-semibold text-[11px]">Orden actual:</span>
-            <span class="text-slate-400 italic text-[11px]">Ninguna comisión seleccionada</span>
-          </div>
-        </div>
+
+        <!-- 6. Notas / Observaciones -->
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Notas / Observaciones</label>
           <textarea id="nota" rows="1" placeholder="Observaciones adicionales..."
             class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
         </div>
+
+        <!-- 7. Link de Google Drive / Archivos -->
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Link de Google Drive / Archivos</label>
           <input type="url" id="proyectoLink" placeholder="https://drive.google.com/..."
             class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
+
+        <!-- Botones de Acción Fijos Abajo -->
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 sticky bottom-0 bg-white py-2">
           <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-lg transition-colors">Cancelar</button>
           <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow">Guardar Proyecto</button>

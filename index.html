@@ -1164,7 +1164,7 @@
       document.getElementById('statDictaminados').textContent = projects.filter(p => p.estado === 'En tratamiento' && (p.comision_actual || p.comisionActual) === DICTAMINADO_OPTION).length;
       document.getElementById('statAprobados').textContent = projects.filter(p => p.estado === 'Aprobado en sesión').length;
       document.getElementById('statRechazados').textContent = projects.filter(p => p.estado === 'Rechazado en sesión').length;
-      document.getElementById('statRetirados').textContent = projects.filter(p => p.estado === 'Retirado en sesión' || p.estado === 'No tomó estado parlamentario').length;
+      document.getElementById('statRetirados').textContent = projects.filter(p => p.estado === 'Retirado en sesión').length;
 
       // Actualizar la leyenda de resultados encontrados
       const resultsCountEl = document.getElementById('resultsCount');

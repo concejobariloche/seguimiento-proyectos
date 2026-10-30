@@ -465,57 +465,6 @@
       "Comisión de Desarrollo Humano", "Sobre Tablas"
     ];
 
-    // Lista inicial de actas disponibles (puedes ir agregando más aquí cuando gustes)
-    let ACTAS_DISPONIBLES = [
-      { texto: "Acta 1182 del 08/12/23", link: "" },
-{ texto: "Acta 1182 del 08/12/23", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17735-acta1182" },
-{ texto: "Acta 1183 del 18/01/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17736-acta1183" },
-{ texto: "Acta 1184 del 22/02/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17737-acta1184" },
-{ texto: "Acta 1185 del 28/02/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17842-acta1185" },
-{ texto: "Acta 1186 del 04/03/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17843-acta1186" },
-{ texto: "Acta 1187 del 21/03/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17844-acta1187" },
-{ texto: "Acta 1188 del 18/04/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17914-acta1188" },
-{ texto: "Acta 1189 del 10/05/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17915-acta1189" },
-{ texto: "Acta 1190 del 30/05/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18086-acta1190" },
-{ texto: "Acta 1191 del 04/07/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18087-acta1191" },
-{ texto: "Acta 1192 del 22/08/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18088-acta1192" },
-{ texto: "Acta 1193 del 12/09/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18508-acta1193" },
-{ texto: "Acta 1194 del 03/10/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18509-acta1194" },
-{ texto: "Acta 1195 del 31/10/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18510-acta1195" },
-{ texto: "Acta 1196 del 21/11/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18511-acta1196" },
-{ texto: "Acta 1197 del 19/12/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18626-acta1197" },
-{ texto: "Acta 1198 del 13/02/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18627-acta1198" },
-{ texto: "Acta 1199 del 06/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18837-acta1199" },
-{ texto: "Acta 1200 del 14/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18924-acta1200" },
-{ texto: "Acta 1201 del 20/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18925-acta1201" },
-{ texto: "Acta 1202 del 22/05/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18926-acta1202" },
-{ texto: "Acta 1203 del 05/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18927-acta1203" },
-{ texto: "Acta 1204 del 06/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18928-acta1204" },
-{ texto: "Acta 1205 del 12/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18929-acta1205" },
-{ texto: "Acta 1206 del 03/07/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18977-acta1206" },
-{ texto: "Acta 1207 del 14/08/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19249-acta1207" },
-{ texto: "Acta 1208 del 27/08/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19250-acta1208" },
-{ texto: "Acta 1209 del 11/09/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19251-acta1209" },
-{ texto: "Acta 1210 del 30/09/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19838-acta1210" },
-{ texto: "Acta 1211 del 30/10/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19839-acta1211" },
-{ texto: "Acta 1212 del 20/11/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19840-acta1212" },
-{ texto: "Acta 1213 del 18/12/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19841-acta1213" },
-{ texto: "Acta 1214 del 06/02/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19842-acta1214" },
-{ texto: "Acta 1215 del 13/02/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19843-acta1215" },
-{ texto: "Acta 1216 del 02/03/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19844-acta1216" },
-{ texto: "Acta 1217 del 26/03/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20018-acta1217" },
-{ texto: "Acta 1218 del 01/04/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20019-acta1218" },
-{ texto: "Acta 1219 del 09/04/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20020-acta1219" },
-{ texto: "Acta 1220 del 14/05/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20111-acta1220" },
-{ texto: "Acta 1221 del 01/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20464-acta1221" },
-{ texto: "Acta 1222 del 02/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20465-acta1222" },
-{ texto: "Acta 1223 del 11/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20466-acta1223" },
-{ texto: "Acta 1224 del 18/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20467-acta1224" },
-{ texto: "Acta 1225 del 03/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20620-acta1225" },
-{ texto: "Acta 1226 del 24/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20621-acta-1226" },
-{ texto: "Acta 1227 del 30/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20622-acta1227" }
-    ];
-
     const DICTAMINADO_OPTION = "Dictaminado para sesión";
 
     let isAdmin = false;
@@ -526,13 +475,34 @@
    // Variable global para almacenar la contraseña actual en memoria
     let currentAdminPass = 'admin123';
 
+    let ACTAS_DISPONIBLES = [];
+
     window.addEventListener('DOMContentLoaded', () => {
       loadPasswordFromSupabase();
       renderAutoresCheckboxes();
       renderRutaCheckboxes();
       populateAutorFilter();
       fetchProjectsFromSupabase();
+      fetchActasFromSupabase(); // Carga las actas desde la nube
     });
+
+    async function fetchActasFromSupabase() {
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('actas')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) {
+          ACTAS_DISPONIBLES = data;
+          poblarSelectActas();
+        }
+      } catch (err) {
+        console.error("Error al cargar actas desde Supabase:", err);
+      }
+    }
 
     async function loadPasswordFromSupabase() {
       if (!supabaseClient) return;
@@ -936,7 +906,7 @@
       document.getElementById('projectModal').classList.add('hidden');
     }
 
-    function saveProject(e) {
+    async function saveProject(e) {
       e.preventDefault();
 
       const editId = document.getElementById('editId').value || null;
@@ -950,21 +920,27 @@
 
       if (modoCrearActaManual) {
         actaFinal = document.getElementById('numActaManual').value.trim();
-        if (actaFinal) {
-          const idx = ACTAS_DISPONIBLES.findIndex(a => a.texto === actaFinal);
-          if (idx >= 0) {
-            ACTAS_DISPONIBLES[idx].link = inputLinkActa;
-          } else {
-            ACTAS_DISPONIBLES.push({ texto: actaFinal, link: inputLinkActa });
+        if (actaFinal && supabaseClient) {
+          // Guardar o actualizar la nueva acta en Supabase
+          try {
+            await supabaseClient.from('actas').upsert(
+              { texto: actaFinal, link: inputLinkActa || null },
+              { onConflict: 'texto' }
+            );
+            await fetchActasFromSupabase(); // Refrescar lista global
+          } catch (err) {
+            console.error("Error al guardar acta en Supabase:", err);
           }
         }
       } else {
         actaFinal = document.getElementById('selectActaExistente').value;
-        if (actaFinal && inputLinkActa) {
-          // Si asignaste o modificaste un link a un acta existente, actualizamos la lista global
-          const encontrada = ACTAS_DISPONIBLES.find(a => a.texto === actaFinal);
-          if (encontrada) {
-            encontrada.link = inputLinkActa;
+        if (actaFinal && inputLinkActa && supabaseClient) {
+          // Si se le agregó o modificó el link a un acta existente, se actualiza en Supabase
+          try {
+            await supabaseClient.from('actas').update({ link: inputLinkActa }).eq('texto', actaFinal);
+            await fetchActasFromSupabase();
+          } catch (err) {
+            console.error("Error al actualizar link de acta en Supabase:", err);
           }
         }
       }

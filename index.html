@@ -312,10 +312,26 @@
           <p class="text-[11px] text-amber-700 mt-1">Si finalizó la ruta en comisiones, marca únicamente <strong>⭐ Dictaminado para sesión</strong>.</p>
         </div>
 
-        <div id="numActaContainer" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Número de Acta de Sesión *</label>
-          <input type="text" id="numActa" placeholder="Ej: Acta N° 1042/26"
-            class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        <!-- CAMBIO: Contenedor de Acta mejorado con selector y link opcional -->
+        <div id="numActaContainer" class="hidden bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-700 uppercase">Acta de Sesión *</label>
+              <button type="button" onclick="toggleNuevaActaMode()" id="btnToggleActaMode" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold underline">
+                + Agregar nueva acta
+              </button>
+            </div>
+            <!-- Selector de actas existentes -->
+            <select id="selectActaExistente" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+              <option value="">Seleccione un acta...</option>
+            </select>
+            <!-- Input manual que aparece si se hace clic en "Agregar nueva acta" -->
+            <input type="text" id="numActaManual" placeholder="Ej: Acta 1221 del 14/03/26" class="hidden w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Link del Acta (Opcional)</label>
+            <input type="url" id="actaLink" placeholder="https://drive.google.com/..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
         </div>
 
         <!-- 6. Notas / Observaciones -->
@@ -432,6 +448,9 @@
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
+    
+
+
     const AUTORES_DISPONIBLES = [
       "Ejecutivo", "Tribunal de Contralor", "Gerardo Del Río (PUL)", "Tomás Hercigonja (PUL)", 
       "María Coronado (PUL)", "Natalia Almonacid (JSRN)", "Silvio Barriga (JSRN)", "Juan Pablo Ferrari (JSRN)", 
@@ -444,6 +463,57 @@
       "Asesoría Letrada", "Comisión de Turismo", "Comisión de Economía", 
       "Comisión de Servicios", "Comisión de Gobierno y Legales", "Comisión de Obras", 
       "Comisión de Desarrollo Humano", "Sobre Tablas"
+    ];
+
+    // Lista inicial de actas disponibles (puedes ir agregando más aquí cuando gustes)
+    let ACTAS_DISPONIBLES = [
+      { texto: "Acta 1182 del 08/12/23", link: "" },
+{ texto: "Acta 1182 del 08/12/23", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17735-acta1182" },
+{ texto: "Acta 1183 del 18/01/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17736-acta1183" },
+{ texto: "Acta 1184 del 22/02/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17737-acta1184" },
+{ texto: "Acta 1185 del 28/02/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17842-acta1185" },
+{ texto: "Acta 1186 del 04/03/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17843-acta1186" },
+{ texto: "Acta 1187 del 21/03/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17844-acta1187" },
+{ texto: "Acta 1188 del 18/04/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17914-acta1188" },
+{ texto: "Acta 1189 del 10/05/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/17915-acta1189" },
+{ texto: "Acta 1190 del 30/05/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18086-acta1190" },
+{ texto: "Acta 1191 del 04/07/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18087-acta1191" },
+{ texto: "Acta 1192 del 22/08/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18088-acta1192" },
+{ texto: "Acta 1193 del 12/09/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18508-acta1193" },
+{ texto: "Acta 1194 del 03/10/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18509-acta1194" },
+{ texto: "Acta 1195 del 31/10/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18510-acta1195" },
+{ texto: "Acta 1196 del 21/11/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18511-acta1196" },
+{ texto: "Acta 1197 del 19/12/24", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18626-acta1197" },
+{ texto: "Acta 1198 del 13/02/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18627-acta1198" },
+{ texto: "Acta 1199 del 06/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18837-acta1199" },
+{ texto: "Acta 1200 del 14/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18924-acta1200" },
+{ texto: "Acta 1201 del 20/03/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18925-acta1201" },
+{ texto: "Acta 1202 del 22/05/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18926-acta1202" },
+{ texto: "Acta 1203 del 05/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18927-acta1203" },
+{ texto: "Acta 1204 del 06/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18928-acta1204" },
+{ texto: "Acta 1205 del 12/06/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18929-acta1205" },
+{ texto: "Acta 1206 del 03/07/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/18977-acta1206" },
+{ texto: "Acta 1207 del 14/08/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19249-acta1207" },
+{ texto: "Acta 1208 del 27/08/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19250-acta1208" },
+{ texto: "Acta 1209 del 11/09/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19251-acta1209" },
+{ texto: "Acta 1210 del 30/09/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19838-acta1210" },
+{ texto: "Acta 1211 del 30/10/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19839-acta1211" },
+{ texto: "Acta 1212 del 20/11/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19840-acta1212" },
+{ texto: "Acta 1213 del 18/12/25", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19841-acta1213" },
+{ texto: "Acta 1214 del 06/02/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19842-acta1214" },
+{ texto: "Acta 1215 del 13/02/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19843-acta1215" },
+{ texto: "Acta 1216 del 02/03/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/19844-acta1216" },
+{ texto: "Acta 1217 del 26/03/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20018-acta1217" },
+{ texto: "Acta 1218 del 01/04/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20019-acta1218" },
+{ texto: "Acta 1219 del 09/04/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20020-acta1219" },
+{ texto: "Acta 1220 del 14/05/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20111-acta1220" },
+{ texto: "Acta 1221 del 01/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20464-acta1221" },
+{ texto: "Acta 1222 del 02/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20465-acta1222" },
+{ texto: "Acta 1223 del 11/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20466-acta1223" },
+{ texto: "Acta 1224 del 18/06/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20467-acta1224" },
+{ texto: "Acta 1225 del 03/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20620-acta1225" },
+{ texto: "Acta 1226 del 24/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20621-acta-1226" },
+{ texto: "Acta 1227 del 30/09/26", link: "https://www.concejobariloche.gov.ar/index.php/documentacion-concejo/actas-de-sesion/20622-acta1227" }
     ];
 
     const DICTAMINADO_OPTION = "Dictaminado para sesión";
@@ -813,7 +883,15 @@
           document.getElementById('tipoProyectoSelect').value = p.tipo || 'Ordenanza';
           document.getElementById('estadoSelect').value = p.estado;
           document.getElementById('descripcion').value = p.descripcion;
-          document.getElementById('numActa').value = p.acta || '';
+          // Rellenamos el selector de actas
+          poblarSelectActas(p.acta || '');
+          document.getElementById('actaLink').value = p.acta_link || '';
+          
+          // Aseguramos que arranque en modo selector por defecto al abrir
+          modoCrearActaManual = false;
+          document.getElementById('selectActaExistente').classList.remove('hidden');
+          document.getElementById('numActaManual').classList.add('hidden');
+          document.getElementById('btnToggleActaMode').textContent = "+ Agregar nueva acta";
           document.getElementById('nota').value = p.nota || '';
           document.getElementById('proyectoLink').value = p.link || '';
 
@@ -842,6 +920,12 @@
         document.getElementById('estadoSelect').value = 'No tomó estado parlamentario';
         document.getElementById('proyectoLink').value = '';
         handleEstadoFormChange();
+        poblarSelectActas();
+          document.getElementById('actaLink').value = '';
+          modoCrearActaManual = false;
+          document.getElementById('selectActaExistente').classList.remove('hidden');
+          document.getElementById('numActaManual').classList.add('hidden');
+          document.getElementById('btnToggleActaMode').textContent = "+ Agregar nueva acta";
       }
 
       updateRutaVisualBadges();
@@ -860,7 +944,19 @@
       const tipo = document.getElementById('tipoProyectoSelect').value;
       const estado = document.getElementById('estadoSelect').value;
       const descripcion = document.getElementById('descripcion').value.trim();
-      const acta = document.getElementById('numActa').value.trim();
+      // Determinamos si se seleccionó del menú o se escribió una nueva manual
+      let actaFinal = '';
+      if (modoCrearActaManual) {
+        actaFinal = document.getElementById('numActaManual').value.trim();
+        if (actaFinal && !ACTAS_DISPONIBLES.some(a => a.texto === actaFinal)) {
+          // Si es nueva, la guardamos automáticamente en la lista global de actas
+          ACTAS_DISPONIBLES.push({ texto: actaFinal, link: document.getElementById('actaLink').value.trim() });
+        }
+      } else {
+        actaFinal = document.getElementById('selectActaExistente').value;
+      }
+
+      const actaLink = document.getElementById('actaLink').value.trim();
       const nota = document.getElementById('nota').value.trim();
 
       const autoresSelected = Array.from(document.querySelectorAll('input[name="autoresSelected"]:checked')).map(cb => cb.value);
@@ -895,7 +991,8 @@
         ruta: [...selectedRutaOrder],
         estado,
         comision_actual: comisionActual,
-        acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? acta : null,
+        acta: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? actaFinal : null,
+        acta_link: ['Aprobado en sesión', 'Rechazado en sesión', 'Retirado en sesión'].includes(estado) ? (actaLink || null) : null,
         nota: nota || null,
         link: link || null
       };
@@ -950,7 +1047,18 @@
           <div>
             <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">Comisión / Ubicación Actual</h4>
             <p class="text-sm font-semibold text-slate-800">${escapeHtml(comActual || p.estado)}</p>
-            ${p.acta ? `<p class="text-xs text-indigo-600 font-bold mt-1"><i class="fa-solid fa-file-signature mr-1"></i>${escapeHtml(p.acta)}</p>` : ''}
+            ${p.acta ? `
+              <div class="mt-1 flex flex-col gap-1.5">
+                <p class="text-xs text-indigo-600 font-bold"><i class="fa-solid fa-file-signature mr-1"></i>${escapeHtml(p.acta)}</p>
+                ${p.acta_link ? `
+                  <a href="${escapeHtml(p.acta_link)}" target="_blank" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all w-fit border border-slate-200">
+                    <i class="fa-solid fa-file-pdf text-rose-500"></i>
+                    <span>Ver documento de acta</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                  </a>
+                ` : ''}
+              </div>
+            ` : ''}
           </div>
         </div>
         <div>
@@ -1152,6 +1260,35 @@ function clearAllFilters() {
       renderProjects();
     }
 
+    let modoCrearActaManual = false;
+
+    function toggleNuevaActaMode() {
+      modoCrearActaManual = !modoCrearActaManual;
+      const selectEl = document.getElementById('selectActaExistente');
+      const inputEl = document.getElementById('numActaManual');
+      const btnToggle = document.getElementById('btnToggleActaMode');
+
+      if (modoCrearActaManual) {
+        selectEl.classList.add('hidden');
+        inputEl.classList.remove('hidden');
+        inputEl.value = '';
+        btnToggle.textContent = "← Seleccionar acta existente";
+        inputEl.focus();
+      } else {
+        inputEl.classList.add('hidden');
+        selectEl.classList.remove('hidden');
+        btnToggle.textContent = "+ Agregar nueva acta";
+        poblarSelectActas();
+      }
+    }
+
+    function poblarSelectActas(valorSeleccionado = '') {
+      const selectEl = document.getElementById('selectActaExistente');
+      if (!selectEl) return;
+
+      selectEl.innerHTML = `<option value="">Seleccione un acta...</option>` + 
+        ACTAS_DISPONIBLES.map(a => `<option value="${escapeHtml(a.texto)}" ${a.texto === valorSeleccionado ? 'selected' : ''}>${escapeHtml(a.texto)}</option>`).join('');
+    }
   </script>
 </body>
 </html>

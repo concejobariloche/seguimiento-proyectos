@@ -1280,6 +1280,9 @@ function clearAllFilters() {
       const selectEl = document.getElementById('selectActaExistente');
       if (!selectEl) return;
 
+      // ORDENAR ALFABÉTICAMENTE: Ordena la lista de actas por su texto de forma limpia
+      ACTAS_DISPONIBLES.sort((a, b) => a.texto.localeCompare(b.texto));
+
       selectEl.innerHTML = `<option value="">Seleccione un acta...</option>` + 
         ACTAS_DISPONIBLES.map(a => `<option value="${escapeHtml(a.texto)}" ${a.texto === valorSeleccionado ? 'selected' : ''}>${escapeHtml(a.texto)}</option>`).join('');
 

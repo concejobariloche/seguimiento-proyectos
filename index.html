@@ -145,7 +145,6 @@
             <option value="Comisión de Obras">Comisión de Obras</option>
             <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
             <option value="Sobre Tablas">Sobre Tablas</option>
-            <option value="Sobre Tablas">Vuelve a comisión</option>
           </select>
         </div>
         <div>
@@ -161,7 +160,6 @@
             <option value="Comisión de Obras">Comisión de Obras</option>
             <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
             <option value="Sobre Tablas">Sobre Tablas</option>
-            <option value="Sobre Tablas">Vuelve a comisión</option>
           </select>
         </div>
         <div>
@@ -484,9 +482,30 @@
       renderAutoresCheckboxes();
       renderRutaCheckboxes();
       populateAutorFilter();
+      populateFilterOptions();
       fetchProjectsFromSupabase();
       fetchActasFromSupabase(); // Carga las actas desde la nube
     });
+
+    function populateFilterOptions() {
+      // 1. Selector de Filtro por Comisión en Ruta (o el nombre de tu ID de filtro de comisión)
+      const filtroRuta = document.getElementById('filtroComision'); // Reemplaza por el ID real de tu select de comisión en filtros
+      if (filtroRuta) {
+        const valorActual = filtroRuta.value;
+        filtroRuta.innerHTML = `<option value="">Todas las comisiones</option>` + 
+          RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
+        filtroRuta.value = valorActual;
+      }
+
+      // 2. Selector de Filtro por Ubicación Actual (si usas un select independiente para la ubicación actual)
+      const filtroUbicacion = document.getElementById('filtroUbicacionActual'); // Reemplaza por el ID real de tu select de ubicación actual si aplica
+      if (filtroUbicacion) {
+        const valorActualUbicacion = filtroUbicacion.value;
+        filtroUbicacion.innerHTML = `<option value="">Todas las ubicaciones</option>` + 
+          RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
+        filtroUbicacion.value = valorActualUbicacion;
+      }
+    }
 
     async function fetchActasFromSupabase() {
       if (!supabaseClient) return;

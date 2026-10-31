@@ -480,12 +480,11 @@
         selectUbicacion.innerHTML = `
           <option value="TODAS">Todas las ubicaciones</option>
           <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
-          <option value="Sobre Tablas">Sobre Tablas</option>
         ` + RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
         selectUbicacion.value = valorActualUbicacion;
       }
 
-      // 2. Selector de Comisión en Ruta (Ajusta el ID si el tuyo se llama distinto, ej: 'filterComisionRuta' o 'filtroComision')
+      // 2. Selector de Comisión en Ruta 
       const selectRuta = document.getElementById('filterComisionRuta'); 
       if (selectRuta) {
         const valorActualRuta = selectRuta.value;

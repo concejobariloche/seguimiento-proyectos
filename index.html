@@ -137,30 +137,15 @@
           <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Comisión en Ruta:</label>
           <select id="filterComisionRuta" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
             <option value="TODAS">Cualquier comisión</option>
-            <option value="Asesoría Letrada">Asesoría Letrada</option>
-            <option value="Comisión de Turismo">Comisión de Turismo</option>
-            <option value="Comisión de Economía">Comisión de Economía</option>
-            <option value="Comisión de Servicios">Comisión de Servicios</option>
-            <option value="Comisión de Gobierno y Legales">Comisión de Gobierno y Legales</option>
-            <option value="Comisión de Obras">Comisión de Obras</option>
-            <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
-            <option value="Sobre Tablas">Sobre Tablas</option>
           </select>
         </div>
         <div>
-          <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Ubicación Actual:</label>
-          <select id="filterComisionActual" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-            <option value="TODAS">Todas las ubicaciones</option>
-            <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
-            <option value="Asesoría Letrada">Asesoría Letrada</option>
-            <option value="Comisión de Turismo">Comisión de Turismo</option>
-            <option value="Comisión de Economía">Comisión de Economía</option>
-            <option value="Comisión de Servicios">Comisión de Servicios</option>
-            <option value="Comisión de Gobierno y Legales">Comisión de Gobierno y Legales</option>
-            <option value="Comisión de Obras">Comisión de Obras</option>
-            <option value="Comisión de Desarrollo Humano">Comisión de Desarrollo Humano</option>
-            <option value="Sobre Tablas">Sobre Tablas</option>
-          </select>
+         <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Ubicación Actual:</label>
+<select id="filterComisionActual" onchange="renderProjects()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+  <option value="TODAS">Todas las ubicaciones</option>
+  <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
+  <!-- Las comisiones de RUTA_OPCIONES se inyectarán solas aquí mediante JavaScript -->
+</select>
         </div>
         <div>
           <label class="block font-bold text-slate-700 uppercase text-[11px] mb-1">Filtrar por Autor:</label>
@@ -482,25 +467,33 @@
       renderAutoresCheckboxes();
       renderRutaCheckboxes();
       populateAutorFilter();
-      poblarFiltrosComision();
+      poblarFiltrosComisiones();
       fetchProjectsFromSupabase();
       fetchActasFromSupabase(); // Carga las actas desde la nube
     });
 
-   function poblarFiltrosComision() {
-      // Supongamos que tu <select> de filtro de comisión tiene un ID como 'filtroComision' o similar
-      const selectFiltro = document.getElementById('filtroComision'); 
-      if (!selectFiltro) return;
+   function poblarFiltrosComisiones() {
+      // 1. Selector de Ubicación Actual
+      const selectUbicacion = document.getElementById('filterComisionActual');
+      if (selectUbicacion) {
+        const valorActualUbicacion = selectUbicacion.value;
+        selectUbicacion.innerHTML = `
+          <option value="TODAS">Todas las ubicaciones</option>
+          <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
+          <option value="Sobre Tablas">Sobre Tablas</option>
+        ` + RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
+        selectUbicacion.value = valorActualUbicacion;
+      }
 
-      const valorSeleccionado = selectFiltro.value;
-
-      // AQUÍ ESTÁ LA CLAVE: En lugar de extraer los datos de los proyectos, 
-      // los cargamos directamente desde la constante global RUTA_OPCIONES
-      selectFiltro.innerHTML = `<option value="">Todas las comisiones</option>` + 
-        RUTA_OPCIONES.map(opcion => `<option value="${escapeHtml(opcion)}">${escapeHtml(opcion)}</option>`).join('');
-
-      // Restauramos el valor elegido para que no se resetee al filtrar
-      selectFiltro.value = valorSeleccionado;
+      // 2. Selector de Comisión en Ruta (Ajusta el ID si el tuyo se llama distinto, ej: 'filterComisionRuta' o 'filtroComision')
+      const selectRuta = document.getElementById('filterComisionRuta'); 
+      if (selectRuta) {
+        const valorActualRuta = selectRuta.value;
+        selectRuta.innerHTML = `
+          <option value="TODAS">Todas las comisiones</option>
+        ` + RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
+        selectRuta.value = valorActualRuta;
+      }
     }
 
     async function fetchActasFromSupabase() {

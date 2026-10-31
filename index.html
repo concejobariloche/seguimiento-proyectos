@@ -479,7 +479,9 @@
           <option value="TODAS">Todas las ubicaciones</option>
           <option value="Dictaminado para sesión">⭐ Dictaminado para sesión</option>
         ` + RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
-        selectUbicacion.value = valorActualUbicacion;
+        
+        // Si no había nada seleccionado o el valor anterior no existe, seleccionamos "TODAS" por defecto
+        selectUbicacion.value = (valorActualUbicacion && valorActualUbicacion !== "") ? valorActualUbicacion : "TODAS";
       }
 
       // 2. Selector de Comisión en Ruta 
@@ -489,7 +491,9 @@
         selectRuta.innerHTML = `
           <option value="TODAS">Todas las comisiones</option>
         ` + RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
-        selectRuta.value = valorActualRuta;
+        
+        // Si no había nada seleccionado o el valor anterior no existe, seleccionamos "TODAS" por defecto
+        selectRuta.value = (valorActualRuta && valorActualRuta !== "") ? valorActualRuta : "TODAS";
       }
     }
 

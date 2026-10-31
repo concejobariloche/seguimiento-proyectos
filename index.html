@@ -482,29 +482,25 @@
       renderAutoresCheckboxes();
       renderRutaCheckboxes();
       populateAutorFilter();
-      populateFilterOptions();
+      poblarFiltrosComision();
       fetchProjectsFromSupabase();
       fetchActasFromSupabase(); // Carga las actas desde la nube
     });
 
-    function populateFilterOptions() {
-      // 1. Selector de Filtro por Comisión en Ruta (o el nombre de tu ID de filtro de comisión)
-      const filtroRuta = document.getElementById('filtroComision'); // Reemplaza por el ID real de tu select de comisión en filtros
-      if (filtroRuta) {
-        const valorActual = filtroRuta.value;
-        filtroRuta.innerHTML = `<option value="">Todas las comisiones</option>` + 
-          RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
-        filtroRuta.value = valorActual;
-      }
+   function poblarFiltrosComision() {
+      // Supongamos que tu <select> de filtro de comisión tiene un ID como 'filtroComision' o similar
+      const selectFiltro = document.getElementById('filtroComision'); 
+      if (!selectFiltro) return;
 
-      // 2. Selector de Filtro por Ubicación Actual (si usas un select independiente para la ubicación actual)
-      const filtroUbicacion = document.getElementById('filtroUbicacionActual'); // Reemplaza por el ID real de tu select de ubicación actual si aplica
-      if (filtroUbicacion) {
-        const valorActualUbicacion = filtroUbicacion.value;
-        filtroUbicacion.innerHTML = `<option value="">Todas las ubicaciones</option>` + 
-          RUTA_OPCIONES.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('');
-        filtroUbicacion.value = valorActualUbicacion;
-      }
+      const valorSeleccionado = selectFiltro.value;
+
+      // AQUÍ ESTÁ LA CLAVE: En lugar de extraer los datos de los proyectos, 
+      // los cargamos directamente desde la constante global RUTA_OPCIONES
+      selectFiltro.innerHTML = `<option value="">Todas las comisiones</option>` + 
+        RUTA_OPCIONES.map(opcion => `<option value="${escapeHtml(opcion)}">${escapeHtml(opcion)}</option>`).join('');
+
+      // Restauramos el valor elegido para que no se resetee al filtrar
+      selectFiltro.value = valorSeleccionado;
     }
 
     async function fetchActasFromSupabase() {

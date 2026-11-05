@@ -1654,7 +1654,7 @@ function clearAllFilters() {
       document.getElementById('editPcmId').value = '';
       document.getElementById('pcmModalTitle').innerHTML = '<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo PCM</span>';
       document.getElementById('pcmForm').reset();
-      document.getElementById('pcmAutorInput').value = 'PruebaNombre'; // O el nombre que prefieras
+      document.getElementById('pcmAutorInput').value = 'Presidente del Concejo Municipal, Gerardo Del Río'; // O el nombre que prefieras
       
       // Poblamos las actas disponibles
       poblarSelectActasPcm();
@@ -1679,13 +1679,12 @@ function clearAllFilters() {
       document.getElementById('pcmCorresponde').value = item.corresponde_a || '';
       document.getElementById('pcmActaLink').value = item.acta_link || '';
 
+      // 1. Poblamos las opciones correctamente usando la función unificada con 'a.texto'
+      poblarSelectActasPcm();
+
+      // 2. Seleccionamos el acta que ya tenía asignada este registro PCM (si la tiene)
       const selectActa = document.getElementById('selectPcmActaExistente');
       if (selectActa) {
-        selectActa.innerHTML = `<option value="">Seleccione un acta...</option>` +
-          (ACTAS_DISPONIBLES || []).map(a => {
-            const nombreActa = a.nombre || a.num_acta || '';
-            return `<option value="${escapeHtml(nombreActa)}">${escapeHtml(nombreActa)}</option>`;
-          }).join('');
         selectActa.value = item.num_acta || '';
       }
 

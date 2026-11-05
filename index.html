@@ -640,6 +640,8 @@
       }
     }
 
+
+    
     async function fetchActasFromSupabase() {
       if (!supabaseClient) return;
       try {
@@ -651,12 +653,30 @@
         if (error) throw error;
         if (data) {
           ACTAS_DISPONIBLES = data;
-          poblarSelectActas();
+          poblarSelectActas(); // Actualiza el selector de proyectos
+          poblarSelectActasPcm(); // NUEVO: Actualiza también el selector de PCM
         }
       } catch (err) {
         console.error("Error al cargar actas desde Supabase:", err);
       }
     }
+
+    function poblarSelectActasPcm() {
+      const selectActa = document.getElementById('selectPcmActaExistente');
+      if (!selectActa) return;
+
+      const valorActual = selectActa.value;
+      selectActa.innerHTML = `<option value="">Seleccione un acta...</option>` +
+        (ACTAS_DISPONIBLES || []).map(a => {
+          // Tomamos la propiedad 'nombre' o 'num_acta' dependiendo de cómo esté guardada en tu tabla actas
+          const textoActa = a.nombre || a.num_acta || '';
+          return `<option value="${escapeHtml(textoActa)}">${escapeHtml(textoActa)}</option>`;
+        }).join('');
+      
+      selectActa.value = valorActual;
+    }
+
+    
 
     async function loadPasswordFromSupabase() {
       if (!supabaseClient) return;
@@ -1635,21 +1655,14 @@ function clearAllFilters() {
       document.getElementById('editPcmId').value = '';
       document.getElementById('pcmModalTitle').innerHTML = '<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo PCM</span>';
       document.getElementById('pcmForm').reset();
-      document.getElementById('pcmAutorInput').value = 'Presidente del Concejo Municipal, Gerardo Del Río';
+      document.getElementById('pcmAutorInput').value = 'Concejal Facundo Villalba'; // O el nombre que prefieras
       
-      // Poblado seguro del selector de actas utilizando la propiedad estándar de tu base de datos
-      const selectActa = document.getElementById('selectPcmActaExistente');
-      if (selectActa) {
-        selectActa.innerHTML = `<option value="">Seleccione un acta...</option>` +
-          (ACTAS_DISPONIBLES || []).map(a => {
-            // Usamos la misma propiedad que usa tu tabla de actas (por lo general 'nombre' o 'num_acta')
-            const nombreActa = a.nombre || a.num_acta || '';
-            return `<option value="${escapeHtml(nombreActa)}">${escapeHtml(nombreActa)}</option>`;
-          }).join('');
-      }
+      // Poblamos las actas disponibles
+      poblarSelectActasPcm();
 
       document.getElementById('pcmModal').classList.remove('hidden');
     }
+    
     function closePcmModal() {
       document.getElementById('pcmModal').classList.add('hidden');
     }

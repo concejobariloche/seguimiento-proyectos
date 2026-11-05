@@ -544,7 +544,7 @@
           <div class="flex items-center justify-between mb-1">
             <label class="block text-xs font-bold text-slate-700 uppercase">Acta de Sesión (Opcional)</label>
           </div>
-          <select id="selectPcmActaExistente" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+          <select id="selectPcmActaExistente" onchange="onActaPcmChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
             <option value="">Seleccione un acta...</option>
           </select>
         </div>
@@ -1630,7 +1630,7 @@ function clearAllFilters() {
           <td class="py-3 px-4 font-bold text-indigo-600 whitespace-nowrap">${escapeHtml(item.num_pcm)}</td>
           <td class="py-3 px-4 text-slate-800">${escapeHtml(item.descripcion)}</td>
           <td class="py-3 px-4 text-slate-600 text-xs">${escapeHtml(item.colaboradores || '-')}</td>
-          <td class="py-3 px-4 text-slate-600 text-xs">${escapeHtml(item.corresponde_a || '-')}</td>
+          <td class="py-3 px-4 text-slate-800 font-semibold text-xs">${escapeHtml(item.corresponde_a || '-')}</td>
           <td class="py-3 px-4 whitespace-nowrap">
             ${item.num_acta ? (item.acta_link ? `<a href="${escapeHtml(item.acta_link)}" target="_blank" class="text-indigo-600 hover:underline font-semibold">${escapeHtml(item.num_acta)} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>` : `<span class="font-semibold text-slate-700">${escapeHtml(item.num_acta)}</span>`) : '<span class="text-slate-400">-</span>'}
           </td>
@@ -1723,6 +1723,27 @@ function clearAllFilters() {
       `;
       document.getElementById('detailModal').classList.remove('hidden');
     }
+
+    function onActaPcmChange() {
+      const selectActa = document.getElementById('selectPcmActaExistente');
+      const inputLink = document.getElementById('pcmActaLink');
+      if (!selectActa || !inputLink) return;
+
+      const textoSeleccionado = selectActa.value;
+      if (!textoSeleccionado) {
+        inputLink.value = '';
+        return;
+      }
+
+      // Buscamos el acta en el array global ACTAS_DISPONIBLES utilizando la propiedad 'texto'
+      const actaEncontrada = ACTAS_DISPONIBLES.find(a => a.texto === textoSeleccionado);
+      if (actaEncontrada && actaEncontrada.link) {
+        inputLink.value = actaEncontrada.link;
+      } else {
+        inputLink.value = '';
+      }
+    }
+
 
   </script>
 </body>

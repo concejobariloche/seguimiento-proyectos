@@ -1637,15 +1637,12 @@ function clearAllFilters() {
       document.getElementById('pcmForm').reset();
       document.getElementById('pcmAutorInput').value = 'Concejal Facundo Villalba';
       
-      // Aseguramos que el selector de actas lea de ACTAS_DISPONIBLES con el nombre correcto de la propiedad
+      // Poblar selector de actas existentes
       const selectActa = document.getElementById('selectPcmActaExistente');
       if (selectActa) {
         selectActa.innerHTML = `<option value="">Seleccione un acta...</option>` +
-          ACTAS_DISPONIBLES.map(a => `<option value="${escapeHtml(a.nombre || a.num_acta || '')}">${escapeHtml(a.nombre || a.num_acta || '')}</option>`).join('');
+          ACTAS_DISPONIBLES.map(a => `<option value="${escapeHtml(a.nombre)}">${escapeHtml(a.nombre)}</option>`).join('');
       }
-
-      document.getElementById('pcmModal').classList.remove('hidden');
-    }
 
     function closePcmModal() {
       document.getElementById('pcmModal').classList.add('hidden');

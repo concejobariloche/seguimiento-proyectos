@@ -665,19 +665,16 @@
       const selectActa = document.getElementById('selectPcmActaExistente');
       if (!selectActa) return;
 
-      console.log("ACTAS_DISPONIBLES actuales:", ACTAS_DISPONIBLES); // <--- MIRA ESTO EN LA CONSOLA (F12)
-
       const valorActual = selectActa.value;
       selectActa.innerHTML = `<option value="">Seleccione un acta...</option>` +
         (ACTAS_DISPONIBLES || []).map(a => {
-          // Buscamos dinámicamente cualquier propiedad que tenga texto útil
-          const textoActa = a.nombre || a.num_acta || a.titulo || a.descripcion || Object.values(a)[1] || 'Acta sin nombre';
-          return `<option value="${escapeHtml(String(textoActa))}">${escapeHtml(String(textoActa))}</option>`;
+          // Usamos la propiedad 'texto' que es la que efectivamente tiene el nombre del acta
+          const textoActa = a.texto || '';
+          return `<option value="${escapeHtml(textoActa)}">${escapeHtml(textoActa)}</option>`;
         }).join('');
       
       selectActa.value = valorActual;
     }
-
     
 
     async function loadPasswordFromSupabase() {

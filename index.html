@@ -1655,14 +1655,14 @@ function clearAllFilters() {
       document.getElementById('editPcmId').value = '';
       document.getElementById('pcmModalTitle').innerHTML = '<i class="fa-solid fa-file-circle-plus text-indigo-400"></i><span>Nuevo PCM</span>';
       document.getElementById('pcmForm').reset();
-      document.getElementById('pcmAutorInput').value = 'Concejal Facundo Villalba'; // O el nombre que prefieras
+      document.getElementById('pcmAutorInput').value = 'PruebaNombre'; // O el nombre que prefieras
       
       // Poblamos las actas disponibles
       poblarSelectActasPcm();
 
       document.getElementById('pcmModal').classList.remove('hidden');
     }
-    
+
     function closePcmModal() {
       document.getElementById('pcmModal').classList.add('hidden');
     }

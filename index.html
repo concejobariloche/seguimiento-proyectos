@@ -239,7 +239,7 @@
   <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
     <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
       <!-- Input de búsqueda -->
-  <div class="relative w-full sm:w-96">
+  <div class="relative w-full">
     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
       <i class="fa-solid fa-magnifying-glass"></i>
     </span>
@@ -1634,20 +1634,50 @@ function clearAllFilters() {
     // SUPABASE: FETCH & SAVE PCM
     // ==========================================
     async function fetchPcmFromSupabase() {
-      if (!supabaseClient) return;
-      try {
-        const { data, error } = await supabaseClient
-          .from('pcm')
-          .select('*');
-        if (error) throw error;
-        if (data) {
-          pcmList = data;
-          renderPcmTable();
+  try {
+    const { data, error } = await supabaseClient
+      .from('pcm')
+      .select('*');
+
+    if (error) throw error;
+
+    pcmList = data || [];
+
+    // --- AQUÍ ESTÁ LA CLAVE ---
+    //arranque siempre ordenado en modo descendente (o ascendente) por defecto:
+    pcmSortDirection = 'desc'; // O 'asc' para invertir orden
+    
+    // Aplicamos la lógica de ordenamiento antes de renderizar por primera vez
+    pcmList.sort((a, b) => {
+      const parsePcm = (str) => {
+        if (!str) return { num: 0, year: 0 };
+        const parts = str.toUpperCase().split('-PCM-');
+        if (parts.length === 2) {
+          const num = parseInt(parts[0], 10) || 0;
+          let year = parseInt(parts[1], 10) || 0;
+          if (year < 100) year += 2000;
+          return { num, year };
         }
-      } catch (err) {
-        console.error("Error al cargar PCM desde Supabase:", err);
+        const fallbackNum = parseInt(str, 10) || 0;
+        return { num: fallbackNum, year: 0 };
+      };
+
+      const valA = parsePcm(a.num_pcm);
+      const valB = parsePcm(b.num_pcm);
+
+      if (valA.year !== valB.year) {
+        return pcmSortDirection === 'asc' ? valA.year - valB.year : valB.year - valA.year;
       }
-    }
+      return pcmSortDirection === 'asc' ? (valA.num - valB.num) : (valB.num - valA.num);
+    });
+
+    // Renderizamos la tabla ya ordenada
+    renderPcmTable();
+
+  } catch (err) {
+    console.error("Error al obtener las Resoluciones PCM:", err);
+  }
+}
 
     async function savePcm(event) {
       event.preventDefault();

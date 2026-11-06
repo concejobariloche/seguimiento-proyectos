@@ -498,6 +498,81 @@
     </div>
   </div>
 
+  <!-- ================= MODAL DETALLE RESOLUCIÓN (PCM) ================= -->
+<div id="detailPcmModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-200 transform transition-all">
+    
+    <!-- Header del Modal -->
+    <div class="bg-slate-900 px-6 py-4 flex items-center justify-between text-white">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600/30 flex items-center justify-center text-indigo-400">
+          <i class="fa-solid fa-file-lines"></i>
+        </div>
+        <h3 class="font-bold text-lg tracking-tight">Detalle de Resolución de Presidencia</h3>
+      </div>
+      <button onclick="document.getElementById('detailPcmModal').classList.add('hidden')" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Cuerpo del Modal -->
+    <div class="p-6 space-y-5 text-slate-700">
+      
+      <!-- Fila 1: N° PCM y Autor -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <div>
+          <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">N° Resolución (PCM)</span>
+          <p id="detailPcmNum" class="font-bold text-indigo-600 text-base">-</p>
+        </div>
+        <div>
+          <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Autor / Iniciativa</span>
+          <p id="detailPcmAutor" class="font-medium text-slate-800 text-sm">-</p>
+        </div>
+      </div>
+
+      <!-- Descripción Sintética -->
+      <div>
+        <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Descripción Sintética</span>
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-sm text-slate-800 leading-relaxed" id="detailPcmDescripcion">
+          -
+        </div>
+      </div>
+
+      <!-- Colaboradores -->
+      <div>
+        <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Colaboradores</span>
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-sm text-slate-800" id="detailPcmColaboradores">
+          -
+        </div>
+      </div>
+
+      <!-- Fila 2: Corresponde a y N° Acta -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <div>
+          <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Corresponde a</span>
+          <div id="detailPcmCorresponde" class="font-medium text-sm text-slate-800">-</div>
+        </div>
+        <div>
+          <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">N° Acta Asociada</span>
+          <div id="detailPcmActa" class="font-medium text-sm text-slate-800">-</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer del Modal -->
+    <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end">
+      <button 
+        onclick="document.getElementById('detailPcmModal').classList.add('hidden')" 
+        class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm rounded-lg transition-colors shadow-sm"
+      >
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
+
   <!-- MODAL: CREAR / EDITAR PCM -->
 <div id="pcmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 overflow-y-auto">
   <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full my-auto max-h-[94vh] flex flex-col overflow-hidden transform transition-all">
@@ -1623,12 +1698,49 @@ function clearAllFilters() {
       return { anio, num };
     }
 
-    function toggleSortPcmOrder() {
-      pcmSortAscending = !pcmSortAscending;
-      const icon = document.getElementById('sortPcmIcon');
-      icon.className = pcmSortAscending ? 'fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform' : 'fa-solid fa-arrow-down-9-1 text-indigo-400 group-hover:scale-110 transition-transform';
-      renderPcmTable();
+    let pcmSortDirection = 'desc'; // 'asc' o 'desc'
+
+function toggleSortPcmOrder() {
+  pcmSortDirection = pcmSortDirection === 'asc' ? 'desc' : 'asc';
+  
+  // Actualizar icono visual si existe
+  const icon = document.getElementById('sortPcmIcon');
+  if (icon) {
+    icon.className = pcmSortDirection === 'asc' 
+      ? 'fa-solid fa-arrow-down-1-9 text-indigo-400 group-hover:scale-110 transition-transform' 
+      : 'fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform';
+  }
+
+  pcmList.sort((a, b) => {
+    // Función auxiliar para extraer el número secuencial y el año de strings tipo "001-PCM-24" o "15-PCM-2025"
+    const parsePcm = (str) => {
+      if (!str) return { num: 0, year: 0 };
+      const parts = str.toUpperCase().split('-PCM-');
+      if (parts.length === 2) {
+        const num = parseInt(parts[0], 10) || 0;
+        let year = parseInt(parts[1], 10) || 0;
+        if (year < 100) year += 2000; // Manejar años de 2 dígitos (ej. "24" -> 2024)
+        return { num, year };
+      }
+      // Fallback si viene solo un número u otro texto
+      const fallbackNum = parseInt(str, 10) || 0;
+      return { num: fallbackNum, year: 0 };
+    };
+
+    const valA = parsePcm(a.num_pcm);
+    const valB = parsePcm(b.num_pcm);
+
+    // Comparar primero por año, luego por número secuencial
+    if (valA.year !== valB.year) {
+      return pcmSortDirection === 'asc' ? valA.year - valB.year : valB.year - valA.year;
     }
+    return pcmSortDirection === 'asc' ? valA.num - valB.num : valB.num - valB.num ? 0 : valB.num - valA.num;
+    // Corregido simple:
+    // return pcmSortDirection === 'asc' ? (valA.num - valB.num) : (valB.num - valA.num);
+  });
+
+  renderPcmTable();
+}
 
     function renderPcmTable() {
   const tbody = document.getElementById('pcmTableBody');
@@ -1762,7 +1874,10 @@ function clearAllFilters() {
     // Modal de Detalle rápido para PCM
     function openDetailPcmModal(id) {
   const item = pcmList.find(p => p.id === id);
-  if (!item) return;
+  if (!item) {
+    console.error("No se encontró el PCM con ID:", id);
+    return;
+  }
 
   const setSafeText = (elemId, val) => {
     const el = document.getElementById(elemId);
@@ -1805,6 +1920,8 @@ function clearAllFilters() {
   const modal = document.getElementById('detailPcmModal');
   if (modal) {
     modal.classList.remove('hidden');
+  } else {
+    console.error("No se encontró el elemento DOM con ID 'detailPcmModal'");
   }
 }
 

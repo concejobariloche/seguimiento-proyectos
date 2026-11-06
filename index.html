@@ -224,17 +224,15 @@
 </div>
 <!-- ================= VISTA PCM (Oculta por defecto) ================= -->
 <div id="vistaPcmContainer" class="hidden space-y-6">
-  <!-- NUEVO: Título de la Sección PCM -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-slate-200">
-    <div>
-      <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2.5">
-        <i class="fa-solid fa-file-lines text-indigo-600"></i>
-        <span>PCM APROBADAS GESTIÓN 2023-2027</span>
-      </h2>
-      <p class="text-xs sm:text-sm text-slate-500 font-medium">
-        Resoluciones de Presidencia
-      </p>
-    </div>
+  <!-- TÍTULO PCM CENTRADO -->
+  <div class="text-center py-2 space-y-1">
+    <h2 class="text-xl sm:text-2xl font-black text-slate-950 tracking-tight uppercase flex items-center justify-center gap-2.5">
+      <i class="fa-solid fa-file-lines text-indigo-600"></i>
+      <span>PCM APROBADAS GESTIÓN 2023-2027</span>
+    </h2>
+    <p class="text-xs sm:text-sm text-slate-500 font-medium">
+      Registro general de Resoluciones de Presidencia
+    </p>
   </div>
 
   <!-- Buscador y Botón Cargar PCM -->
@@ -266,20 +264,20 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead class="bg-slate-900 text-slate-200 font-semibold uppercase text-xs tracking-wider">
-          <tr>
-            <th scope="col" onclick="toggleSortPcmOrder()" class="py-3.5 px-4 w-28 whitespace-nowrap cursor-pointer hover:bg-slate-800 transition-colors select-none group" title="Haz clic para ordenar por N° PCM">
-              <div class="flex items-center gap-1.5">
-                <span>N° PCM</span>
-                <i id="sortPcmIcon" class="fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform"></i>
-              </div>
-            </th>
-            <th scope="col" class="py-3.5 px-4">Descripción Sintética</th>
-            <th scope="col" class="py-3.5 px-4 w-56">Colaboradores / Iniciativa</th>
-            <th scope="col" class="py-3.5 px-4 w-44">Corresponde a</th>
-            <th scope="col" class="py-3.5 px-4 w-24">N° Acta</th>
-            <th scope="col" class="py-3.5 px-4 w-20 text-center">Acciones</th>
-          </tr>
-        </thead>
+  <tr>
+    <th scope="col" onclick="toggleSortPcmOrder()" class="py-3.5 px-4 w-28 whitespace-nowrap cursor-pointer hover:bg-slate-800 transition-colors select-none group" title="Haz clic para ordenar por N° PCM">
+      <div class="flex items-center gap-1.5">
+        <span>N° PCM</span>
+        <i id="sortPcmIcon" class="fa-solid fa-arrow-up-1-9 text-indigo-400 group-hover:scale-110 transition-transform"></i>
+      </div>
+    </th>
+    <th scope="col" class="py-3.5 px-4 w-5/12">Descripción Sintética</th>
+    <th scope="col" class="py-3.5 px-4 w-5/12">Colaboradores / Iniciativa</th>
+    <th scope="col" class="py-3.5 px-4 w-44">Corresponde a</th>
+    <th scope="col" class="py-3.5 px-4 w-24">N° Acta</th>
+    <th scope="col" class="py-3.5 px-4 w-20 text-center">Acciones</th>
+  </tr>
+</thead>
         <tbody id="pcmTableBody" class="divide-y divide-slate-200 text-slate-700">
           <!-- Dinámico -->
         </tbody>
@@ -1639,25 +1637,25 @@ function clearAllFilters() {
 
       emptyState.classList.add('hidden');
       tbody.innerHTML = filtrados.map(item => `
-        <tr class="hover:bg-slate-50/80 transition-colors">
-          <td class="py-3 px-4 font-bold text-indigo-600 whitespace-nowrap">${escapeHtml(item.num_pcm)}</td>
-          <td class="py-3 px-4 text-slate-800">${escapeHtml(item.descripcion)}</td>
-          <td class="py-3 px-4 text-slate-600 text-xs">${escapeHtml(item.colaboradores || '-')}</td>
-          <td class="py-3 px-4 text-slate-800 font-semibold text-xs">${escapeHtml(item.corresponde_a || '-')}</td>
-          <td class="py-3 px-4 whitespace-nowrap">
-            ${item.num_acta ? (item.acta_link ? `<a href="${escapeHtml(item.acta_link)}" target="_blank" class="text-indigo-600 hover:underline font-semibold">${escapeHtml(item.num_acta)} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>` : `<span class="font-semibold text-slate-700">${escapeHtml(item.num_acta)}</span>`) : '<span class="text-slate-400">-</span>'}
-          </td>
-          <td class="py-3 px-4 text-center whitespace-nowrap">
-            <div class="flex items-center justify-center gap-1.5">
-              <button onclick="openDetailPcmModal('${item.id}')" title="Ver Detalle" class="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"><i class="fa-solid fa-eye"></i></button>
-              ${isAdmin ? `
-                <button onclick="openEditPcmModal('${item.id}')" title="Editar" class="p-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button onclick="deletePcm('${item.id}')" title="Eliminar" class="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
-              ` : ''}
-            </div>
-          </td>
-        </tr>
-      `).join('');
+  <tr class="hover:bg-slate-50/80 transition-colors">
+    <td class="py-3 px-4 font-bold text-indigo-600 whitespace-nowrap">${escapeHtml(item.num_pcm)}</td>
+    <td class="py-3 px-4 text-slate-800">${escapeHtml(item.descripcion)}</td>
+    <td class="py-3 px-4 text-slate-800">${escapeHtml(item.colaboradores || '-')}</td>
+    <td class="py-3 px-4 text-slate-800 font-semibold text-xs">${escapeHtml(item.corresponde_a || '-')}</td>
+    <td class="py-3 px-4 whitespace-nowrap">
+      ${item.num_acta ? (item.acta_link ? `<a href="${escapeHtml(item.acta_link)}" target="_blank" class="text-indigo-600 hover:underline font-semibold">${escapeHtml(item.num_acta)} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>` : `<span class="font-semibold text-slate-700">${escapeHtml(item.num_acta)}</span>`) : '<span class="text-slate-400">-</span>'}
+    </td>
+    <td class="py-3 px-4 text-center whitespace-nowrap">
+      <div class="flex items-center justify-center gap-1.5">
+        <button onclick="openDetailPcmModal('${item.id}')" title="Ver Detalle" class="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"><i class="fa-solid fa-eye"></i></button>
+        ${isAdmin ? `
+          <button onclick="openEditPcmModal('${item.id}')" title="Editar" class="p-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deletePcm('${item.id}')" title="Eliminar" class="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
+        ` : ''}
+      </div>
+    </td>
+  </tr>
+`).join('');
     }
 
     // ==========================================
